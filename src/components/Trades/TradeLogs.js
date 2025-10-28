@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
-import { TrendingUp, PlusCircle, History, PieChart, Bug } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { TrendingUp, PlusCircle, History, PieChart, Search } from 'lucide-react';
 import TradeForm from './TradeForm';
 import ClosedTradesHistory from './ClosedTradesHistory';
 import TradeStats from './TradeStats';
+import ActivePositions from './ActivePositions';
 import Diversification from './Diversification';
-import TradesDebug from '../Debug/TradesDebug';
+// import TradesDebug from '../Debug/TradesDebug'; // Removido temporalmente
+import Logo from '../common/Logo';
 import { useStrapiTrades } from '../../hooks/useStrapiTrades';
 import { colors, componentColors, getTradingColor, withOpacity } from '../../styles/colors';
 
 const PageContainer = styled.div`
-  max-width: 1200px;
+  max-width: 1500px;
   margin: 0 auto;
   padding: 2rem;
 `;
@@ -45,7 +48,7 @@ const TabContainer = styled.div`
   display: flex;
   margin-bottom: 2rem;
   background: ${colors.gray[50]};
-  border-radius: 12px;
+  border-radius: 6px;
   padding: 0.5rem;
 `;
 
@@ -58,7 +61,7 @@ const Tab = styled.button`
   font-size: 1rem;
   font-weight: 500;
   font-family: 'Unbounded', sans-serif;
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: ${props => props.active ? '0 2px 8px rgba(0, 0, 0, 0.1)' : 'none'};
@@ -77,6 +80,7 @@ const TabContent = styled.div`
 `;
 
 const TradeLogs = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('stats');
   const { trades, openTrades, closedTrades, stats, loading, error, createTrade, deleteTrade, closeTrade, refreshTrades } = useStrapiTrades();
 
@@ -97,9 +101,13 @@ const TradeLogs = () => {
     }
   };
 
-  const handleCloseTrade = async (tradeId, exitPrice, result) => {
+  const handleLogoClick = () => {
+    navigate('/');
+  };
+
+  const handleCloseTrade = async (tradeId, exitPrice, result, notes) => {
     try {
-      await closeTrade(tradeId, exitPrice, result);
+      await closeTrade(tradeId, exitPrice, result, notes);
     } catch (err) {
       console.error('Error closing trade:', err);
     }
@@ -114,11 +122,16 @@ const TradeLogs = () => {
           transition={{ duration: 0.6 }}
         >
           <PageTitle>
-            <TrendingUp size={40} />
-            Diario de Trades
+            <Logo 
+              size="80px" 
+              fontSize="3.5rem" 
+              gap="1.5rem"
+              onClick={handleLogoClick}
+              style={{ cursor: 'pointer' }}
+            />
           </PageTitle>
           <PageSubtitle>
-            Registra tus trades y analiza tu rendimiento
+            Tu diario personal de trading - Registra, analiza y mejora tus operaciones
           </PageSubtitle>
         </motion.div>
       </PageHeader>
@@ -130,6 +143,13 @@ const TradeLogs = () => {
         >
           <TrendingUp size={20} />
           Resumen
+        </Tab>
+        <Tab 
+          active={activeTab === 'portfolio' ? 'true' : 'false'} 
+          onClick={() => setActiveTab('portfolio')}
+        >
+          <PieChart size={20} />
+          Portfolio
         </Tab>
         <Tab 
           active={activeTab === 'form' ? 'true' : 'false'} 
@@ -153,11 +173,11 @@ const TradeLogs = () => {
           Diversificación
         </Tab>
         <Tab 
-          active={activeTab === 'debug' ? 'true' : 'false'} 
-          onClick={() => setActiveTab('debug')}
+          active={activeTab === 'screener' ? 'true' : 'false'} 
+          onClick={() => setActiveTab('screener')}
         >
-          <Bug size={20} />
-          Debug
+          <Search size={20} />
+          Screener
         </Tab>
       </TabContainer>
 
@@ -171,10 +191,15 @@ const TradeLogs = () => {
           {activeTab === 'stats' ? (
             <TradeStats 
               stats={stats} 
+              openTrades={openTrades}
               loading={loading}
               error={error}
+            />
+          ) : activeTab === 'portfolio' ? (
+            <ActivePositions
               openTrades={openTrades}
-              closedTrades={closedTrades}
+              loading={loading}
+              error={error}
               onCloseTrade={handleCloseTrade}
             />
           ) : activeTab === 'form' ? (
@@ -185,15 +210,26 @@ const TradeLogs = () => {
               loading={loading}
               error={error}
             />
-          ) : activeTab === 'debug' ? (
-            <TradesDebug 
-              trades={trades}
-              openTrades={openTrades}
-              closedTrades={closedTrades}
-              loading={loading}
-              error={error}
-              refreshTrades={refreshTrades}
-            />
+          ) : activeTab === 'screener' ? (
+            <div style={{ 
+              padding: '3rem', 
+              textAlign: 'center', 
+              color: '#7f8c8d',
+              fontFamily: 'Unbounded, sans-serif'
+            }}>
+              <Search size={64} color="#7f8c8d" style={{ marginBottom: '1rem' }} />
+              <h3 style={{ 
+                fontSize: '1.5rem', 
+                fontWeight: 600, 
+                color: '#2c3e50', 
+                margin: '0 0 0.5rem 0' 
+              }}>
+                Screener de Acciones
+              </h3>
+              <p style={{ fontSize: '1rem', margin: 0 }}>
+                Próximamente: Herramienta para analizar y filtrar acciones
+              </p>
+            </div>
           ) : (
             <ClosedTradesHistory 
               closedTrades={closedTrades}

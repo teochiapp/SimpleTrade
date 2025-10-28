@@ -70,6 +70,29 @@ const ButtonGroup = styled.div`
   margin-top: 2rem;
 `;
 
+const TextArea = styled.textarea`
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: 'Unbounded', sans-serif;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+  min-height: 100px;
+  resize: vertical;
+
+  &:focus {
+    outline: none;
+    border-color: #3498db;
+  }
+
+  &::placeholder {
+    color: #95a5a6;
+    font-style: italic;
+  }
+`;
+
 const Button = styled.button`
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -136,6 +159,7 @@ const ErrorMessage = styled.div`
 
 const CloseTradeModal = ({ isOpen, onClose, trade, onTradeClosed }) => {
   const [exitPrice, setExitPrice] = useState('');
+  const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -144,6 +168,14 @@ const CloseTradeModal = ({ isOpen, onClose, trade, onTradeClosed }) => {
     if (!trade) return null;
     return trade.attributes ? trade.attributes[attr] : trade[attr];
   };
+
+  // Inicializar notas existentes cuando se abre el modal
+  React.useEffect(() => {
+    if (isOpen && trade) {
+      const existingNotes = getTradeAttr(trade, 'notes') || '';
+      setNotes(existingNotes);
+    }
+  }, [isOpen, trade]);
 
   // Calcular resultado automáticamente en porcentaje
   const calculateResult = () => {
@@ -179,7 +211,7 @@ const CloseTradeModal = ({ isOpen, onClose, trade, onTradeClosed }) => {
 
     try {
       const result = calculateResult();
-      await onTradeClosed(trade.id, parseFloat(exitPrice), parseFloat(result));
+      await onTradeClosed(trade.id, parseFloat(exitPrice), parseFloat(result), notes.trim());
       onClose();
     } catch (err) {
       setError(err.message);
@@ -190,6 +222,7 @@ const CloseTradeModal = ({ isOpen, onClose, trade, onTradeClosed }) => {
 
   const handleClose = () => {
     setExitPrice('');
+    setNotes('');
     setError('');
     onClose();
   };

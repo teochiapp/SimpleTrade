@@ -77,7 +77,7 @@ export const DashboardContentStyled = styled.main`
 `;
 
 export const DashboardContainerStyled = styled.div`
-  max-width: 1200px;
+  max-width: 1500px;
   margin: 0 auto;
 `;
 

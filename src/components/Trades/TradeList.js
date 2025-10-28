@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
+import { getStrategyDisplayName } from './TradeForm';
 
 const ListContainer = styled.div`
   background: white;
@@ -380,7 +381,7 @@ const TradeList = ({ trades, loading, error, onTradeDeleted }) => {
                     </TradeDetail>
                     {trade.attributes.strategy && (
                       <TradeDetail>
-                        <strong>Estrategia:</strong> {trade.attributes.strategy}
+                        <strong>Estrategia:</strong> {getStrategyDisplayName(trade.attributes.strategy)}
                       </TradeDetail>
                     )}
                     {trade.attributes.emotions && (

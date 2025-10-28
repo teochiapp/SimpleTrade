@@ -1,7 +1,7 @@
-// styles/colors.js - Paleta de colores centralizada de SimpleTrade
+// styles/colors.js - Paleta de colores centralizada de SimpliTrade
 
 /**
- * Paleta de colores oficial de SimpleTrade
+ * Paleta de colores oficial de SimpliTrade
  * 
  * Diseño: Elegante, profesional y moderno
  * Inspiración: Trading profesional con toques sofisticados

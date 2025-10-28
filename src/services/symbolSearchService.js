@@ -73,9 +73,6 @@ class SymbolSearchService {
   // Búsqueda usando APIs reales
   async searchRealSymbols(query) {
     switch (this.config.provider) {
-      case PRICE_PROVIDERS.ALPHAVANTAGE:
-        return await this.searchAlphaVantage(query);
-      
       case PRICE_PROVIDERS.IEX_CLOUD:
         return await this.searchIEXCloud(query);
       
@@ -85,28 +82,6 @@ class SymbolSearchService {
       default:
         return this.searchMockSymbols(query);
     }
-  }
-
-  // Búsqueda en Alpha Vantage
-  async searchAlphaVantage(query) {
-    const url = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(query)}&apikey=${this.config.apiKey}`;
-    
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Error en Alpha Vantage search');
-    
-    const data = await response.json();
-    
-    if (!data.bestMatches) return [];
-    
-    return data.bestMatches.slice(0, 10).map(match => ({
-      symbol: match['1. symbol'],
-      name: match['2. name'],
-      type: match['3. type'],
-      region: match['4. region'],
-      currency: match['8. currency'],
-      sector: 'Unknown', // Alpha Vantage no incluye sector en búsqueda
-      price: null // Se obtiene por separado si es necesario
-    }));
   }
 
   // Búsqueda en IEX Cloud

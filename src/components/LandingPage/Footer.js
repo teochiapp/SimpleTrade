@@ -4,7 +4,7 @@ import { Footer as FooterStyled } from './styled/SectionStyles';
 const Footer = () => {
   return (
     <FooterStyled>
-      <p>&copy; 2024 SimpleTrade. Todos los derechos reservados.</p>
+      <p>&copy; 2024 SimpliTrade. Todos los derechos reservados.</p>
     </FooterStyled>
   );
 };

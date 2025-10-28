@@ -219,7 +219,7 @@ const DevAuth = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <AuthTitle>🔐 SimpleTrade</AuthTitle>
+        <AuthTitle>🔐 SimpliTrade</AuthTitle>
         
         <DevInfo>
           💡 Modo Desarrollo: Usa las credenciales por defecto o regístrate

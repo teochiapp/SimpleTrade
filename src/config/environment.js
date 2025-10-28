@@ -5,7 +5,7 @@ const config = {
   FINNHUB_API_KEY: process.env.REACT_APP_FINNHUB_API_KEY || 'd3t6mg9r01qqdgfufaggd3t6mg9r01qqdgfufah0',
   
   // Configuración de la aplicación
-  APP_NAME: 'SimpleTrade',
+  APP_NAME: 'SimpliTrade',
   APP_VERSION: '1.0.0',
   
   // Configuración de desarrollo

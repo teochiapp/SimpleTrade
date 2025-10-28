@@ -3,6 +3,20 @@ import { motion } from 'framer-motion';
 import styled from 'styled-components';
 import { Search, TrendingUp, DollarSign, Percent, Shield, Target, BookOpen, Lightbulb } from 'lucide-react';
 import SymbolSearch from '../common/SymbolSearch';
+import { colors } from '../../styles/colors';
+
+// Helper function para convertir valores de estrategia a nombres legibles
+export const getStrategyDisplayName = (strategyValue) => {
+  if (!strategyValue) return 'N/A';
+  
+  const strategyMap = {
+    'day_trading': 'Day Trading',
+    'swing_trading': 'Swing Trading', 
+    'largo_plazo': 'Largo Plazo'
+  };
+  
+  return strategyMap[strategyValue] || strategyValue;
+};
 
 const FormContainer = styled.div`
   background: white;
@@ -109,6 +123,7 @@ const Button = styled.button`
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   font-size: 1rem;
+  margin-top: 1rem;
   font-weight: 500;
   font-family: 'Unbounded', sans-serif;
   cursor: pointer;
@@ -116,15 +131,15 @@ const Button = styled.button`
   border: none;
 
   &.primary {
-    background: #3498db;
+    background: ${colors.primary};
     color: white;
 
     &:hover {
-      background: #2980b9;
+      background: ${colors.primaryDark};
     }
 
     &:disabled {
-      background: #bdc3c7;
+      background: ${colors.gray[400]};
       cursor: not-allowed;
     }
   }
@@ -326,10 +341,6 @@ const TradeForm = ({ onTradeAdded }) => {
           Nuevo Trade
         </FormTitle>
         
-        <InfoBox>
-          <Lightbulb size={16} style={{marginRight: '0.5rem'}} />
-          Usa el buscador inteligente para encontrar instrumentos. Puedes buscar por símbolo (AAPL), nombre (Apple) o sector (Tecnología). El precio de salida se registrará cuando cierres el trade.
-        </InfoBox>
         
         {success && <SuccessMessage>{success}</SuccessMessage>}
         {error && <ErrorMessage>{error}</ErrorMessage>}
@@ -456,7 +467,7 @@ const TradeForm = ({ onTradeAdded }) => {
                 value={formData.strategy}
                 onChange={handleInputChange}
               >
-                <option value="">Seleccionar estrategia...</option>
+                <option value="">Seleccionar...</option>
                 <option value="day_trading">Day Trading</option>
                 <option value="swing_trading">Swing Trading</option>
                 <option value="largo_plazo">Largo Plazo</option>

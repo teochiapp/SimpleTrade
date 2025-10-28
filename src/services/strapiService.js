@@ -261,7 +261,7 @@ class StrapiService {
   }
 
   // Cerrar trade (actualizar con precio de salida y resultado)
-  async closeTrade(tradeId, exitPrice, result) {
+  async closeTrade(tradeId, exitPrice, result, notes = '') {
     try {
       console.log(`🔒 Iniciando cierre de trade ${tradeId}...`);
       
@@ -290,7 +290,8 @@ class StrapiService {
         exit_price: exitPrice,
         result: result, // resultado en porcentaje (ej: 10.5 = 10.5%)
         status: 'closed',
-        closed_at: new Date().toISOString()
+        closed_at: new Date().toISOString(),
+        notes: notes || null // Agregar observaciones al cerrar
       };
 
       const updatedTrade = await this.updateTrade(tradeId, tradeData);

@@ -54,7 +54,7 @@ const HeroSection = () => {
         <HeroContent>
           <motion.div variants={itemVariants}>
             <HeroText>
-              <h1>SimpleTrade</h1>
+              <h1>SimpliTrade</h1>
               <h2>Tu Diario de Trading Personal</h2>
               <HeroDescription>
                 Registra tus trades, analiza tus resultados y mejora tu estrategia de trading 
@@ -90,7 +90,7 @@ const HeroSection = () => {
             <HeroImage>
               <MockupContainer>
                 <MockupScreen>
-                  <MockupHeader>SimpleTrade Dashboard</MockupHeader>
+                  <MockupHeader>SimpliTrade Dashboard</MockupHeader>
                   <MockupContent>
                     <MockupTrade>
                       <TradeInfo>

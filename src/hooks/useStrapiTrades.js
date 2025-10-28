@@ -70,9 +70,9 @@ export const useStrapiTrades = () => {
     }
   }, [loadTrades]);
 
-  const closeTrade = useCallback(async (tradeId, exitPrice, result) => {
+  const closeTrade = useCallback(async (tradeId, exitPrice, result, notes = '') => {
     try {
-      const closedTrade = await strapiService.closeTrade(tradeId, exitPrice, result);
+      const closedTrade = await strapiService.closeTrade(tradeId, exitPrice, result, notes);
       await loadTrades(); // Recargar datos
       return closedTrade;
     } catch (err) {

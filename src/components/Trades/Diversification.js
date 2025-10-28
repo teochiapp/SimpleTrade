@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { BarChart3, Building2, Globe, Factory } from 'lucide-react';
+import { BarChart3, Building2, Globe, Factory, Wallet } from 'lucide-react';
 import { getSymbolData, CHART_COLORS } from '../../config/marketData';
 import { colors, componentColors, getTradingColor, withOpacity } from '../../styles/colors';
 
@@ -313,6 +313,10 @@ const Diversification = ({ openTrades, loading, error }) => {
           <StatValue>{diversificationData.totalPortfolio}%</StatValue>
           <StatLabel>Total Asignado</StatLabel>
         </StatCard>
+        <StatCard $color={colors.gray[600]}>
+          <StatValue>{(100 - diversificationData.totalPortfolio).toFixed(1)}%</StatValue>
+          <StatLabel>Liquidez Disponible</StatLabel>
+        </StatCard>
       </StatsGrid>
 
       <ChartContainer>
@@ -358,6 +362,10 @@ const Diversification = ({ openTrades, loading, error }) => {
           <StatValue>{diversificationData.countries[0]?.value || 0}%</StatValue>
           <StatLabel>Concentración Geográfica</StatLabel>
         </StatCard>
+        <StatCard $color={colors.gray[600]}>
+          <StatValue>{(100 - diversificationData.totalPortfolio).toFixed(1)}%</StatValue>
+          <StatLabel>Liquidez Disponible</StatLabel>
+        </StatCard>
       </StatsGrid>
 
       <ChartContainer>
@@ -402,6 +410,10 @@ const Diversification = ({ openTrades, loading, error }) => {
         <StatCard $color={colors.trading.profit}>
           <StatValue>{diversificationData.sectors[0]?.value || 0}%</StatValue>
           <StatLabel>Concentración Sectorial</StatLabel>
+        </StatCard>
+        <StatCard $color={colors.gray[600]}>
+          <StatValue>{(100 - diversificationData.totalPortfolio).toFixed(1)}%</StatValue>
+          <StatLabel>Liquidez Disponible</StatLabel>
         </StatCard>
       </StatsGrid>
 

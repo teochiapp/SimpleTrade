@@ -6,6 +6,7 @@ import { AlertTriangle, TrendingUp, Hand, Target, Building2, ArrowUpCircle, Arro
 import CloseTradeModal from './CloseTradeModal';
 import { useRealTimePrices } from '../../hooks/useRealTimePrices';
 import companyLogoService from '../../services/companyLogoService';
+import { getStrategyDisplayName } from './TradeForm';
 import { colors, componentColors, getTradingColor, withOpacity } from '../../styles/colors';
 
 const PositionsContainer = styled.div`
@@ -625,7 +626,7 @@ const ActivePositions = ({ openTrades, loading, error, onCloseTrade }) => {
                 <DetailItem>
                   <DetailLabel>Estrategia</DetailLabel>
                   <DetailValue>
-                    {getTradeAttr(trade, 'strategy') || 'N/A'}
+                    {getStrategyDisplayName(getTradeAttr(trade, 'strategy'))}
                   </DetailValue>
                 </DetailItem>
               </PositionDetails>

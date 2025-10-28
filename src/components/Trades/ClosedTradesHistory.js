@@ -1,8 +1,22 @@
 // components/Trades/ClosedTradesHistory.js - Historial de trades cerrados
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
-import { Trash2, AlertTriangle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Trash2, 
+  AlertTriangle, 
+  X, 
+  Calendar, 
+  DollarSign, 
+  TrendingUp, 
+  TrendingDown, 
+  Target, 
+  Shield, 
+  Clock,
+  BarChart3,
+  Eye
+} from 'lucide-react';
+import { getStrategyDisplayName } from './TradeForm';
 import { colors, componentColors, getTradingColor, withOpacity } from '../../styles/colors';
 
 const HistoryContainer = styled.div`
@@ -213,6 +227,145 @@ const ModalContent = styled(motion.div)`
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 `;
 
+// Modal de detalles del trade
+const TradeDetailModal = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+`;
+
+const TradeDetailContent = styled(motion.div)`
+  background: ${colors.white};
+  border-radius: 16px;
+  padding: 0;
+  min-width: 500px;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: ${colors.shadows.xl};
+  border: 1px solid ${colors.gray[200]};
+`;
+
+const DetailHeader = styled.div`
+  background: ${colors.gradients.primary};
+  color: ${colors.white};
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const DetailTitle = styled.h3`
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: 'Unbounded', sans-serif;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+`;
+
+const CloseButton = styled.button`
+  background: none;
+  border: none;
+  color: ${colors.white};
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+  }
+`;
+
+const DetailBody = styled.div`
+  padding: 2rem;
+`;
+
+const DetailSection = styled.div`
+  margin-bottom: 2rem;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const SectionTitle = styled.h4`
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: 'Unbounded', sans-serif;
+  color: ${colors.black};
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid ${colors.gray[100]};
+`;
+
+const DetailGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+`;
+
+const DetailItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+`;
+
+const ModalDetailLabel = styled.span`
+  font-size: 0.85rem;
+  color: ${colors.gray[600]};
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
+const ModalDetailValue = styled.span`
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: 'Unbounded', sans-serif;
+  color: ${colors.black};
+  
+  ${props => props.$positive && `color: ${colors.trading.profit};`}
+  ${props => props.$negative && `color: ${colors.trading.loss};`}
+  ${props => props.$highlight && `
+    background: ${colors.gray[50]};
+    padding: 0.5rem;
+    border-radius: 8px;
+    border-left: 4px solid ${colors.primary};
+  `}
+`;
+
+const TradeTypeChip = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: 'Unbounded', sans-serif;
+  background: ${props => props.type === 'buy' ? colors.trading.long : colors.trading.short};
+  color: ${colors.white};
+`;
+
 const ModalHeader = styled.div`
   display: flex;
   align-items: center;
@@ -272,6 +425,8 @@ const ClosedTradesHistory = ({ closedTrades, loading, error, onDeleteTrade }) =>
 
   const [filteredTrades, setFilteredTrades] = useState([]);
   const [deleteConfirm, setDeleteConfirm] = useState({ show: false, trade: null });
+  const [selectedTrade, setSelectedTrade] = useState(null);
+  const [showTradeDetail, setShowTradeDetail] = useState(false);
 
   // Función para adaptar estructura de Strapi
   const getTradeAttr = (trade, attr) => {
@@ -375,11 +530,34 @@ const ClosedTradesHistory = ({ closedTrades, loading, error, onDeleteTrade }) =>
     setDeleteConfirm({ show: false, trade: null });
   };
 
-  const formatDate = (dateString) => {
+  // Funciones para el modal de detalles
+  const handleTradeClick = (trade) => {
+    setSelectedTrade(trade);
+    setShowTradeDetail(true);
+  };
+
+  const handleCloseDetail = () => {
+    setShowTradeDetail(false);
+    setSelectedTrade(null);
+  };
+
+  // Función para calcular días que estuvo abierto el trade
+  const calculateTradeDuration = (trade) => {
+    const entryDate = new Date(getTradeAttr(trade, 'createdAt'));
+    const exitDate = new Date(getTradeAttr(trade, 'closed_at'));
+    const diffTime = Math.abs(exitDate - entryDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  // Función para formatear fechas
+  const formatTradeDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
@@ -485,6 +663,8 @@ const ClosedTradesHistory = ({ closedTrades, loading, error, onDeleteTrade }) =>
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
+              onClick={() => handleTradeClick(trade)}
+              style={{ cursor: 'pointer' }}
             >
               <TradeHeader>
                 <TradeSymbol>
@@ -493,9 +673,12 @@ const ClosedTradesHistory = ({ closedTrades, loading, error, onDeleteTrade }) =>
                 <TradeHeaderRight>
                   <TradeResult $positive={calculateTradeResult(trade) >= 0}>
                     {formatPercentage(calculateTradeResult(trade))}%
-                  </TradeResult>
+                </TradeResult>
                   <DeleteButton 
-                    onClick={() => handleDeleteClick(trade)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Evitar que se abra el modal
+                      handleDeleteClick(trade);
+                    }}
                     title="Eliminar trade del historial"
                   >
                     <Trash2 size={16} />
@@ -520,11 +703,11 @@ const ClosedTradesHistory = ({ closedTrades, loading, error, onDeleteTrade }) =>
                 </TradeDetail>
                 <TradeDetail>
                   <DetailLabel>Estrategia</DetailLabel>
-                  <DetailValue>{getTradeAttr(trade, 'strategy') || 'N/A'}</DetailValue>
+                  <DetailValue>{getStrategyDisplayName(getTradeAttr(trade, 'strategy'))}</DetailValue>
                 </TradeDetail>
                 <TradeDetail>
                   <DetailLabel>Cerrado</DetailLabel>
-                  <DetailValue>{formatDate(getTradeAttr(trade, 'closed_at'))}</DetailValue>
+                  <DetailValue>{formatTradeDate(getTradeAttr(trade, 'closed_at'))}</DetailValue>
                 </TradeDetail>
               </TradeDetails>
             </TradeItem>
@@ -566,6 +749,210 @@ const ClosedTradesHistory = ({ closedTrades, loading, error, onDeleteTrade }) =>
           </ModalContent>
         </ModalOverlay>
       )}
+
+      {/* Modal de detalles del trade */}
+      <AnimatePresence>
+        {showTradeDetail && selectedTrade && (
+          <TradeDetailModal
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={handleCloseDetail}
+          >
+            <TradeDetailContent
+              initial={{ opacity: 0, scale: 0.8, y: 50 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 50 }}
+              transition={{ duration: 0.3 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <DetailHeader>
+                <DetailTitle>
+                  <Eye size={24} />
+                  Detalles del Trade
+                </DetailTitle>
+                <CloseButton onClick={handleCloseDetail}>
+                  <X size={20} />
+                </CloseButton>
+              </DetailHeader>
+
+              <DetailBody>
+                {/* Información básica */}
+                <DetailSection>
+                  <SectionTitle>
+                    <BarChart3 size={20} />
+                    Información General
+                  </SectionTitle>
+                  <DetailGrid>
+                    <DetailItem>
+                      <ModalDetailLabel>Símbolo</ModalDetailLabel>
+                      <ModalDetailValue $highlight>
+                        {getTradeAttr(selectedTrade, 'symbol')}
+                      </ModalDetailValue>
+                    </DetailItem>
+                    <DetailItem>
+                      <ModalDetailLabel>Tipo de Operación</ModalDetailLabel>
+                      <TradeTypeChip type={getTradeAttr(selectedTrade, 'type')}>
+                        {getTradeAttr(selectedTrade, 'type') === 'buy' ? (
+                          <>
+                            <TrendingUp size={14} />
+                            COMPRA (LONG)
+                          </>
+                        ) : (
+                          <>
+                            <TrendingDown size={14} />
+                            VENTA (SHORT)
+                          </>
+                        )}
+                      </TradeTypeChip>
+                    </DetailItem>
+                    <DetailItem>
+                      <ModalDetailLabel>Estrategia</ModalDetailLabel>
+                      <ModalDetailValue>
+                        {getStrategyDisplayName(getTradeAttr(selectedTrade, 'strategy'))}
+                      </ModalDetailValue>
+                    </DetailItem>
+                    <DetailItem>
+                      <ModalDetailLabel>% de Cartera</ModalDetailLabel>
+                      <ModalDetailValue>
+                        {getTradeAttr(selectedTrade, 'portfolio_percentage') || 0}%
+                      </ModalDetailValue>
+                    </DetailItem>
+                  </DetailGrid>
+                </DetailSection>
+
+                {/* Precios y rendimiento */}
+                <DetailSection>
+                  <SectionTitle>
+                    <DollarSign size={20} />
+                    Precios y Rendimiento
+                  </SectionTitle>
+                  <DetailGrid>
+                    <DetailItem>
+                      <ModalDetailLabel>Precio de Entrada</ModalDetailLabel>
+                      <ModalDetailValue>
+                        ${Number(getTradeAttr(selectedTrade, 'entry_price')).toFixed(2)}
+                      </ModalDetailValue>
+                    </DetailItem>
+                    <DetailItem>
+                      <ModalDetailLabel>Precio de Salida</ModalDetailLabel>
+                      <ModalDetailValue>
+                        ${Number(getTradeAttr(selectedTrade, 'exit_price')).toFixed(2)}
+                      </ModalDetailValue>
+                    </DetailItem>
+                    <DetailItem>
+                      <ModalDetailLabel>Resultado</ModalDetailLabel>
+                      <ModalDetailValue 
+                        $positive={calculateTradeResult(selectedTrade) >= 0}
+                        $negative={calculateTradeResult(selectedTrade) < 0}
+                        $highlight
+                      >
+                        {calculateTradeResult(selectedTrade) >= 0 ? '+' : ''}
+                        {formatPercentage(calculateTradeResult(selectedTrade))}%
+                      </ModalDetailValue>
+                    </DetailItem>
+                    <DetailItem>
+                      <ModalDetailLabel>Diferencia de Precio</ModalDetailLabel>
+                      <ModalDetailValue>
+                        ${Math.abs(
+                          Number(getTradeAttr(selectedTrade, 'exit_price')) - 
+                          Number(getTradeAttr(selectedTrade, 'entry_price'))
+                        ).toFixed(2)}
+                      </ModalDetailValue>
+                    </DetailItem>
+                  </DetailGrid>
+                </DetailSection>
+
+                {/* Stop Loss y Take Profit */}
+                {(getTradeAttr(selectedTrade, 'stop_loss') || getTradeAttr(selectedTrade, 'take_profit')) && (
+                  <DetailSection>
+                    <SectionTitle>
+                      <Shield size={20} />
+                      Gestión de Riesgo
+                    </SectionTitle>
+                    <DetailGrid>
+                      {getTradeAttr(selectedTrade, 'stop_loss') && (
+                        <DetailItem>
+                          <ModalDetailLabel>Stop Loss</ModalDetailLabel>
+                          <ModalDetailValue>
+                            ${Number(getTradeAttr(selectedTrade, 'stop_loss')).toFixed(2)}
+                          </ModalDetailValue>
+                        </DetailItem>
+                      )}
+                      {getTradeAttr(selectedTrade, 'take_profit') && (
+                        <DetailItem>
+                          <ModalDetailLabel>Take Profit</ModalDetailLabel>
+                          <ModalDetailValue>
+                            ${Number(getTradeAttr(selectedTrade, 'take_profit')).toFixed(2)}
+                          </ModalDetailValue>
+                        </DetailItem>
+                      )}
+                    </DetailGrid>
+                  </DetailSection>
+                )}
+
+                {/* Observaciones - Sección más prominente */}
+                {getTradeAttr(selectedTrade, 'notes') && (
+                  <DetailSection>
+                    <SectionTitle>
+                      <Eye size={20} />
+                      Observaciones del Trade (Análisis)
+                    </SectionTitle>
+                    <DetailGrid>
+                      <DetailItem style={{ gridColumn: '1 / -1' }}>
+                        <ModalDetailLabel>Notas y Aprendizajes</ModalDetailLabel>
+                        <ModalDetailValue 
+                          $highlight
+                          style={{ 
+                            padding: '1rem',
+                            backgroundColor: '#f8f9fa',
+                            borderLeft: `4px solid ${colors.primary}`,
+                            borderRadius: '8px',
+                            fontStyle: 'italic',
+                            lineHeight: '1.6',
+                            whiteSpace: 'pre-wrap'
+                          }}
+                        >
+                          "{getTradeAttr(selectedTrade, 'notes')}"
+                        </ModalDetailValue>
+                      </DetailItem>
+                    </DetailGrid>
+                  </DetailSection>
+                )}
+
+                {/* Fechas y duración */}
+                <DetailSection>
+                  <SectionTitle>
+                    <Calendar size={20} />
+                    Cronología
+                  </SectionTitle>
+                  <DetailGrid>
+                    <DetailItem>
+                      <ModalDetailLabel>Fecha de Apertura</ModalDetailLabel>
+                      <ModalDetailValue>
+                        {formatTradeDate(getTradeAttr(selectedTrade, 'createdAt'))}
+                      </ModalDetailValue>
+                    </DetailItem>
+                    <DetailItem>
+                      <ModalDetailLabel>Fecha de Cierre</ModalDetailLabel>
+                      <ModalDetailValue>
+                        {formatTradeDate(getTradeAttr(selectedTrade, 'closed_at'))}
+                      </ModalDetailValue>
+                    </DetailItem>
+                    <DetailItem>
+                      <ModalDetailLabel>Duración</ModalDetailLabel>
+                      <ModalDetailValue $highlight>
+                        <Clock size={16} style={{ display: 'inline', marginRight: '0.5rem' }} />
+                        {calculateTradeDuration(selectedTrade)} día{calculateTradeDuration(selectedTrade) !== 1 ? 's' : ''}
+                      </ModalDetailValue>
+                    </DetailItem>
+                  </DetailGrid>
+                </DetailSection>
+              </DetailBody>
+            </TradeDetailContent>
+          </TradeDetailModal>
+        )}
+      </AnimatePresence>
     </HistoryContainer>
   );
 };

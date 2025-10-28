@@ -40,7 +40,7 @@ const Header = () => {
   return (
     <HeaderContainer>
       <HeaderBrand>
-        <h1>SimpleTrade</h1>
+        <h1>SimpliTrade</h1>
         <Tagline>Tu Diario de Trading</Tagline>
       </HeaderBrand>
       

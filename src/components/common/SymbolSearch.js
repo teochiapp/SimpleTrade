@@ -2,7 +2,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
 import symbolSearchService from '../../services/symbolSearchService';
+import priceService from '../../services/priceService';
 
 const SearchContainer = styled.div`
   position: relative;
@@ -139,6 +141,33 @@ const SymbolMeta = styled.div`
   font-family: 'Unbounded', sans-serif;
 `;
 
+const PriceContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: ${props => props.$isLoading ? '#f8f9fa' : 'rgba(34, 197, 94, 0.1)'};
+  border-radius: 6px;
+  border-left: 3px solid ${props => props.$isLoading ? '#bdc3c7' : '#22c55e'};
+`;
+
+const PriceValue = styled.span`
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: ${props => props.$isLoading ? '#7f8c8d' : '#16a34a'};
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+`;
+
+const PriceLoading = styled.span`
+  font-size: 0.8rem;
+  color: #7f8c8d;
+  font-style: italic;
+`;
+
 const RegionFlag = styled.span`
   font-size: 1rem;
 `;
@@ -161,10 +190,12 @@ const SymbolSearch = ({ onSymbolSelect, placeholder = "Buscar instrumento...", i
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [prices, setPrices] = useState(new Map()); // Map para almacenar precios por símbolo
+  const [loadingPrices, setLoadingPrices] = useState(new Set()); // Set para símbolos cargando precio
   
+  const containerRef = useRef();
+  const inputRef = useRef();
   const searchTimeoutRef = useRef(null);
-  const inputRef = useRef(null);
-  const containerRef = useRef(null);
 
   // Buscar símbolos con debounce
   useEffect(() => {
@@ -180,6 +211,8 @@ const SymbolSearch = ({ onSymbolSelect, placeholder = "Buscar instrumento...", i
         try {
           const popularSymbols = await symbolSearchService.searchSymbols("");
           setResults(popularSymbols);
+          // Cargar precios para símbolos populares
+          loadPricesForResults(popularSymbols);
         } catch (error) {
           console.error('Error cargando símbolos populares:', error);
           setResults([]);
@@ -193,16 +226,18 @@ const SymbolSearch = ({ onSymbolSelect, placeholder = "Buscar instrumento...", i
     // Buscar con debounce de 300ms
     searchTimeoutRef.current = setTimeout(async () => {
       setLoading(true);
-      try {
-        const searchResults = await symbolSearchService.searchSymbols(query);
-        setResults(searchResults);
-        setSelectedIndex(-1);
-      } catch (error) {
-        console.error('Error en búsqueda:', error);
-        setResults([]);
-      } finally {
-        setLoading(false);
-      }
+        try {
+          const searchResults = await symbolSearchService.searchSymbols(query);
+          setResults(searchResults);
+          setSelectedIndex(-1);
+          // Cargar precios para los resultados
+          loadPricesForResults(searchResults);
+        } catch (error) {
+          console.error('Error en búsqueda:', error);
+          setResults([]);
+        } finally {
+          setLoading(false);
+        }
     }, 300);
 
     return () => {
@@ -277,11 +312,48 @@ const SymbolSearch = ({ onSymbolSelect, placeholder = "Buscar instrumento...", i
     setIsOpen(true);
   };
 
+  // Nueva función para cargar precios
+  const loadPricesForResults = async (symbols) => {
+    if (!symbols || symbols.length === 0) return;
+    
+    // Tomar solo los primeros 5 para no sobrecargar la API
+    const symbolsToLoad = symbols.slice(0, 5);
+    
+    for (const symbol of symbolsToLoad) {
+      if (!prices.has(symbol.symbol) && !loadingPrices.has(symbol.symbol)) {
+        // Marcar como cargando
+        setLoadingPrices(prev => new Set([...prev, symbol.symbol]));
+        
+        try {
+          const price = await priceService.getCurrentPrice(symbol.symbol);
+          setPrices(prev => new Map([...prev, [symbol.symbol, price]]));
+        } catch (error) {
+          console.warn(`Error loading price for ${symbol.symbol}:`, error);
+          // Marcar como error en el precio
+          setPrices(prev => new Map([...prev, [symbol.symbol, null]]));
+        } finally {
+          // Quitar del set de carga
+          setLoadingPrices(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(symbol.symbol);
+            return newSet;
+          });
+        }
+      }
+    }
+  };
+
   const handleSymbolSelect = (symbol) => {
+    // Agregar el precio al objeto symbol si está disponible
+    const symbolWithPrice = {
+      ...symbol,
+      currentPrice: prices.get(symbol.symbol)
+    };
+    
     setQuery(symbol.symbol);
     setIsOpen(false);
     setSelectedIndex(-1);
-    onSymbolSelect(symbol);
+    onSymbolSelect(symbolWithPrice);
   };
 
   const renderResults = () => {
@@ -336,6 +408,22 @@ const SymbolSearch = ({ onSymbolSelect, placeholder = "Buscar instrumento...", i
               <span>•</span>
               <span>💱 {symbol.currency}</span>
             </SymbolMeta>
+            
+            {/* Mostrar precio */}
+            <PriceContainer $isLoading={loadingPrices.has(symbol.symbol)}>
+              {loadingPrices.has(symbol.symbol) ? (
+                <PriceLoading>🔍 Cargando precio...</PriceLoading>
+              ) : prices.has(symbol.symbol) ? (
+                <PriceValue $isLoading={false}>
+                  <DollarSign size={14} />
+                  {prices.get(symbol.symbol) !== null 
+                    ? `$${Number(prices.get(symbol.symbol)).toFixed(2)}` 
+                    : 'N/A'
+                  }
+                  <TrendingUp size={12} />
+                </PriceValue>
+              ) : null}
+            </PriceContainer>
           </SymbolOption>
         ))}
       </>

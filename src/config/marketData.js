@@ -10,7 +10,8 @@ export const COUNTRIES = {
   KOR: 'Corea del Sur',
   IND: 'India',
   CAN: 'Canadá',
-  AUS: 'Australia'
+  AUS: 'Australia',
+  OTHER: 'Otro'
 };
 
 export const SECTORS = {
@@ -25,7 +26,8 @@ export const SECTORS = {
   MATERIALS: 'Materiales',
   REAL_ESTATE: 'Bienes Raíces',
   TELECOMMUNICATIONS: 'Telecomunicaciones',
-  CRYPTO: 'Criptomonedas'
+  CRYPTO: 'Criptomonedas',
+  OTHER: 'Otro'
 };
 
 // Mapeo de símbolos a países y sectores
@@ -104,16 +106,18 @@ export const getSymbolData = (symbol) => {
   if (!data) {
     // Valores por defecto para símbolos no reconocidos
     return {
-      country: 'USA',
-      sector: 'TECHNOLOGY',
-      company: symbol || 'Desconocido'
+      country: 'OTHER',
+      sector: 'OTHER',
+      company: symbol || 'Desconocido',
+      countryName: 'Otro',
+      sectorName: 'Otro'
     };
   }
   
   return {
     ...data,
-    countryName: COUNTRIES[data.country],
-    sectorName: SECTORS[data.sector]
+    countryName: COUNTRIES[data.country] || 'Otro',
+    sectorName: SECTORS[data.sector] || 'Otro'
   };
 };
 

@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo    SimpleTrade - Desarrollo Local
+echo    SimpliTrade - Desarrollo Local
 echo ========================================
 echo.
 

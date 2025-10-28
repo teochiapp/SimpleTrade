@@ -20,7 +20,7 @@ const DashboardHeader = () => {
   return (
     <DashboardHeaderStyled>
       <DashboardBrand>
-        <h1>SimpleTrade Dashboard</h1>
+        <h1>SimpliTrade Dashboard</h1>
       </DashboardBrand>
       
       <DashboardNav>

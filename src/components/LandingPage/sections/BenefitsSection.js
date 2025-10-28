@@ -37,7 +37,7 @@ const BenefitsSection = () => {
     <BenefitsSectionStyled id="beneficios">
       <Container>
         <SectionHeader>
-          <h2>¿Por qué elegir SimpleTrade?</h2>
+          <h2>¿Por qué elegir SimpliTrade?</h2>
           <p>Los beneficios de llevar un diario de trading digital</p>
         </SectionHeader>
         
