@@ -1,8 +1,18 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# ================================
+# BACKEND - Includes node_modules and env files
+# ================================
+/simpletrade-backend/node_modules/
+/simpletrade-backend/.env
+/simpletrade-backend/.env.*
+/simpletrade-backend/database/*.db
+/simpletrade-backend/database/*.sqlite
+/simpletrade-backend/.tmp/
+/simpletrade-backend/build/
+
 # dependencies
 /node_modules
-/simpletrade-backend/node_modules
 /.pnp
 .pnp.js
 
@@ -11,7 +21,6 @@
 
 # production
 /build
-/simpletrade-backend/build
 
 # misc
 .DS_Store
@@ -22,18 +31,12 @@
 
 # API keys y configuración sensible
 .env
-simpletrade-backend/.env
 
 # Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 *.log
-
-# Base de datos Strapi (desarrollo)
-simpletrade-backend/database/data.db
-simpletrade-backend/.tmp/
-simpletrade-backend/public/uploads/*
 
 # Cache
 .cache/

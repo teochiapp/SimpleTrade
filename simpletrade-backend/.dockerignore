@@ -1,0 +1,17 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.tmp/
+.cache/
+build/
+dist/
+*.log
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+database/*.db
+database/*.sqlite
+!database/migrations/
