@@ -1,8 +1,9 @@
 import styled from 'styled-components';
+import { colors } from '../../../styles/colors';
 
 export const FeaturesSection = styled.section`
   padding: 5rem 2rem;
-  background: #f8f9fa;
+  background: ${colors.white};
 `;
 
 export const Container = styled.div`
@@ -18,7 +19,7 @@ export const SectionHeader = styled.div`
     font-size: 2.5rem;
     font-weight: 600;
     font-family: 'Unbounded', sans-serif;
-    color: #2c3e50;
+    color: ${colors.primary};
     margin-bottom: 1rem;
   }
 
@@ -26,7 +27,7 @@ export const SectionHeader = styled.div`
     font-size: 1.2rem;
     font-weight: 300;
     font-family: 'Unbounded', sans-serif;
-    color: #7f8c8d;
+    color: ${colors.gray[600]};
   }
 `;
 
@@ -41,40 +42,51 @@ export const FeaturesGrid = styled.div`
 `;
 
 export const FeatureCard = styled.div`
-  background: white;
+  background: ${colors.gray[50]};
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: ${colors.shadows.base};
   text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.3s ease;
+  border: 1px solid ${colors.gray[200]};
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    box-shadow: ${colors.shadows.lg};
+    border-color: ${colors.primary};
   }
 
   .feature-icon {
     font-size: 3rem;
     margin-bottom: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    svg {
+      width: 48px;
+      height: 48px;
+      color: ${colors.primary};
+    }
   }
 
   h3 {
     font-size: 1.5rem;
     font-weight: 500;
     font-family: 'Unbounded', sans-serif;
-    color: #2c3e50;
+    color: ${colors.black};
     margin-bottom: 1rem;
   }
 
   p {
-    color: #7f8c8d;
+    color: ${colors.gray[600]};
     line-height: 1.6;
   }
 `;
 
 export const BenefitsSection = styled.section`
   padding: 5rem 2rem;
-  background: white;
+  background: ${colors.gray[50]};
 `;
 
 export const BenefitsGrid = styled.div`
@@ -87,22 +99,41 @@ export const BenefitsGrid = styled.div`
 export const BenefitCard = styled.div`
   text-align: center;
   padding: 2rem;
+  background: ${colors.white};
+  border-radius: 12px;
+  box-shadow: ${colors.shadows.base};
+  transition: all 0.3s ease;
+  border: 1px solid ${colors.gray[200]};
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: ${colors.shadows.md};
+  }
 
   .benefit-icon {
     font-size: 3rem;
     margin-bottom: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    svg {
+      width: 48px;
+      height: 48px;
+      color: ${colors.secondary};
+    }
   }
 
   h3 {
     font-size: 1.5rem;
     font-weight: 500;
     font-family: 'Unbounded', sans-serif;
-    color: #2c3e50;
+    color: ${colors.black};
     margin-bottom: 1rem;
   }
 
   p {
-    color: #7f8c8d;
+    color: ${colors.gray[600]};
     line-height: 1.6;
   }
 `;
@@ -120,20 +151,22 @@ export const StatItem = styled.div`
   .stat-number {
     font-size: 3rem;
     font-weight: 800;
-    color: #3498db;
+    background: ${colors.gradients.primary};
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     margin-bottom: 0.5rem;
   }
 
   .stat-label {
-    color: #7f8c8d;
+    color: ${colors.gray[600]};
     font-size: 1.1rem;
   }
 `;
 
 export const CtaSection = styled.section`
   padding: 5rem 2rem;
-  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-  color: white;
+  background: ${colors.gradients.secondary};
+  color: ${colors.white};
   text-align: center;
 `;
 
@@ -180,23 +213,25 @@ export const CtaButtons = styled.div`
   }
 
   .btn-primary {
-    background-color: #3498db;
-    color: white;
+    background: ${colors.gradients.primary};
+    color: ${colors.white};
+    box-shadow: ${colors.shadows.primary};
 
     &:hover {
-      background-color: #2980b9;
+      background: ${colors.primaryDark};
       transform: translateY(-2px);
+      box-shadow: ${colors.shadows.lg};
     }
   }
 
   .btn-secondary {
     background-color: transparent;
-    color: white;
-    border: 2px solid white;
+    color: ${colors.white};
+    border: 2px solid ${colors.white};
 
     &:hover {
-      background-color: white;
-      color: #2c3e50;
+      background-color: ${colors.white};
+      color: ${colors.secondary};
     }
   }
 `;
@@ -219,18 +254,26 @@ export const CtaFeature = styled.div`
   gap: 0.5rem;
 
   .check-icon {
-    color: #27ae60;
+    color: ${colors.trading.profit};
     font-weight: bold;
+    display: flex;
+    align-items: center;
+    
+    svg {
+      width: 20px;
+      height: 20px;
+    }
   }
 `;
 
 export const Footer = styled.footer`
-  background-color: #34495e;
-  color: white;
+  background: ${colors.black};
+  color: ${colors.white};
   text-align: center;
   padding: 2rem;
 
   p {
     margin: 0;
+    opacity: 0.9;
   }
 `;

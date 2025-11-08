@@ -115,15 +115,46 @@ class SymbolSearchService {
     
     if (!data.result) return [];
     
-    return data.result.slice(0, 10).map(item => ({
-      symbol: item.symbol,
-      name: item.description,
-      type: item.type,
-      region: 'US', // Finnhub principalmente US
-      currency: 'USD',
-      sector: 'Unknown',
-      price: null
-    }));
+    // Filtrar solo NYSE (US) y BYMA (Argentina)
+    const filtered = data.result.filter(item => {
+      const symbol = item.symbol || '';
+      const displaySymbol = item.displaySymbol || '';
+      
+      // Excluir CDRs, ETPs, warrants, y otros instrumentos derivados
+      if (symbol.includes('.') || displaySymbol.includes('.')) {
+        // Permitir solo .BA (BYMA - Buenos Aires)
+        if (!symbol.endsWith('.BA') && !displaySymbol.endsWith('.BA')) {
+          return false;
+        }
+      }
+      
+      // Excluir símbolos con sufijos no deseados
+      const excludedSuffixes = ['.NE', '.L', '.TO', '.V', '.CN', '.HK', '.SW', '.PA', '.DE', '.MI'];
+      if (excludedSuffixes.some(suffix => symbol.endsWith(suffix) || displaySymbol.endsWith(suffix))) {
+        return false;
+      }
+      
+      // Solo Common Stock y acciones de BYMA
+      const allowedTypes = ['Common Stock', 'EQS', 'Equity'];
+      if (!allowedTypes.includes(item.type) && !symbol.endsWith('.BA')) {
+        return false;
+      }
+      
+      return true;
+    });
+    
+    return filtered.slice(0, 10).map(item => {
+      const isArgentina = item.symbol.endsWith('.BA');
+      return {
+        symbol: item.symbol,
+        name: item.description,
+        type: item.type === 'Common Stock' ? 'Equity' : item.type,
+        region: isArgentina ? 'AR' : 'US',
+        currency: isArgentina ? 'ARS' : 'USD',
+        sector: 'Unknown',
+        price: null
+      };
+    });
   }
 
   // Símbolos populares por defecto

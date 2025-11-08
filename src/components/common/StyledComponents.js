@@ -1,9 +1,10 @@
 import styled from 'styled-components';
+import { colors } from '../../styles/colors';
 
 export const StyledButton = styled.button`
-  background: ${props => props.$primary ? '#3498db' : 'transparent'};
-  color: ${props => props.$primary ? 'white' : '#3498db'};
-  border: ${props => props.$primary ? 'none' : '2px solid #3498db'};
+  background: ${props => props.$primary ? colors.gradients.primary : 'transparent'};
+  color: ${props => props.$primary ? colors.white : colors.primary};
+  border: ${props => props.$primary ? 'none' : `2px solid ${colors.primary}`};
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   font-size: 1rem;
@@ -16,10 +17,10 @@ export const StyledButton = styled.button`
   gap: 0.5rem;
   
   &:hover {
-    background: ${props => props.$primary ? '#2980b9' : '#3498db'};
-    color: white;
+    background: ${props => props.$primary ? colors.primaryDark : colors.primary};
+    color: ${colors.white};
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    box-shadow: ${props => props.$primary ? colors.shadows.primary : colors.shadows.base};
   }
   
   &:disabled {
@@ -30,22 +31,22 @@ export const StyledButton = styled.button`
 `;
 
 export const StyledCard = styled.div`
-  background: white;
+  background: ${colors.white};
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: ${colors.shadows.base};
   transition: all 0.3s ease;
   
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    box-shadow: ${colors.shadows.lg};
   }
 `;
 
 export const StyledInput = styled.input`
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid #e1e8ed;
+  border: 2px solid ${colors.gray[200]};
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s ease;
@@ -53,11 +54,11 @@ export const StyledInput = styled.input`
   
   &:focus {
     outline: none;
-    border-color: #3498db;
+    border-color: ${colors.primary};
   }
   
   &::placeholder {
-    color: #bdc3c7;
+    color: ${colors.gray[400]};
   }
 `;
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { TrendingUp, NotebookPen, Settings2, LogOut } from 'lucide-react';
 import authService from '../../services/authService';
 import {
   DashboardHeaderStyled,
@@ -25,14 +26,15 @@ const DashboardHeader = () => {
       
       <DashboardNav>
         <ul>
-          <li><a href="#trades">Mis Trades</a></li>
-          <li><a href="#analytics">Análisis</a></li>
-          <li><a href="#settings">Configuración</a></li>
+          <li><a href="#trades"><TrendingUp size={18} />Mis Trades</a></li>
+          <li><a href="#analytics"><NotebookPen size={18} />Análisis</a></li>
+          <li><a href="#settings"><Settings2 size={18} />Configuración</a></li>
         </ul>
       </DashboardNav>
 
       <DashboardActions>
         <LogoutButton onClick={handleLogout}>
+          <LogOut size={18} />
           Cerrar Sesión
         </LogoutButton>
       </DashboardActions>

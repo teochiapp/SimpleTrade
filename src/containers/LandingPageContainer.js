@@ -1,8 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import LandingPage from '../components/LandingPage/LandingPage';
 
 const LandingPageContainer = () => {
-  return <LandingPage />;
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  const handleOpenLoginModal = () => {
+    setIsLoginModalOpen(true);
+  };
+
+  const handleCloseLoginModal = () => {
+    setIsLoginModalOpen(false);
+  };
+
+  return (
+    <LandingPage
+      isLoginModalOpen={isLoginModalOpen}
+      onOpenLoginModal={handleOpenLoginModal}
+      onCloseLoginModal={handleCloseLoginModal}
+    />
+  );
 };
 
 export default LandingPageContainer;

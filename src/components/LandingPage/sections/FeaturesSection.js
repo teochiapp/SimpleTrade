@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { BookText, MessageSquare, BarChart2, TrendingUp, Target, Shield } from 'lucide-react';
 import {
   FeaturesSection as FeaturesSectionStyled,
   Container,
@@ -11,32 +12,32 @@ import {
 const FeaturesSection = () => {
   const features = [
     {
-      icon: '📝',
+      icon: <BookText />,
       title: 'Registro de Trades',
       description: 'Documenta cada trade con entrada, salida, objetivo y stop loss de manera organizada.'
     },
     {
-      icon: '💭',
+      icon: <MessageSquare />,
       title: 'Anotaciones Personales',
       description: 'Añade observaciones, emociones y lecciones aprendidas en cada operación.'
     },
     {
-      icon: '📊',
+      icon: <BarChart2 />,
       title: 'Seguimiento de Métricas',
       description: 'Monitorea tu win rate, profit factor y otras estadísticas importantes.'
     },
     {
-      icon: '📈',
+      icon: <TrendingUp />,
       title: 'Análisis de Resultados',
       description: 'Visualiza tu progreso y identifica patrones en tu trading.'
     },
     {
-      icon: '🎯',
+      icon: <Target />,
       title: 'Gestión de Objetivos',
       description: 'Establece y sigue tus objetivos de trading con herramientas de seguimiento.'
     },
     {
-      icon: '🔒',
+      icon: <Shield />,
       title: 'Datos Seguros',
       description: 'Tus datos están protegidos y respaldados de forma segura en la nube.'
     }

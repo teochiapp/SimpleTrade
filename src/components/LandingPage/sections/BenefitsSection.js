@@ -1,4 +1,5 @@
 import React from 'react';
+import { Rocket, Brain, BarChart3, Zap } from 'lucide-react';
 import {
   BenefitsSection as BenefitsSectionStyled,
   Container,
@@ -14,22 +15,22 @@ const BenefitsSection = () => {
     {
       title: 'Mejora tu Trading',
       description: 'Identifica patrones y errores para mejorar tu estrategia de trading.',
-      icon: '🚀'
+      icon: <Rocket />
     },
     {
       title: 'Control Emocional',
       description: 'Registra tus emociones para desarrollar mejor disciplina en el trading.',
-      icon: '🧠'
+      icon: <Brain />
     },
     {
       title: 'Análisis Profundo',
       description: 'Analiza tus resultados con métricas detalladas y gráficos informativos.',
-      icon: '📊'
+      icon: <BarChart3 />
     },
     {
       title: 'Fácil de Usar',
       description: 'Interfaz intuitiva que te permite registrar trades en segundos.',
-      icon: '⚡'
+      icon: <Zap />
     }
   ];
 

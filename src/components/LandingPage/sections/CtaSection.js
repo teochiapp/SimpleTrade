@@ -1,4 +1,5 @@
 import React from 'react';
+import { Check } from 'lucide-react';
 import {
   CtaSection as CtaSectionStyled,
   Container,
@@ -8,7 +9,7 @@ import {
   CtaFeature
 } from '../styled/SectionStyles';
 
-const CtaSection = () => {
+const CtaSection = ({ onOpenLoginModal }) => {
   return (
     <CtaSectionStyled id="contacto">
       <Container>
@@ -20,10 +21,7 @@ const CtaSection = () => {
           </p>
           
           <CtaButtons>
-            <button className="btn-primary" onClick={() => {
-              const loginBtn = document.querySelector('.login-btn');
-              if (loginBtn) loginBtn.click();
-            }}>
+            <button className="btn-primary" onClick={onOpenLoginModal}>
               Comenzar Gratis
             </button>
             <button className="btn-secondary">
@@ -33,15 +31,15 @@ const CtaSection = () => {
           
           <CtaFeatures>
             <CtaFeature>
-              <span className="check-icon">✓</span>
+              <span className="check-icon"><Check /></span>
               <span>Registro gratuito</span>
             </CtaFeature>
             <CtaFeature>
-              <span className="check-icon">✓</span>
+              <span className="check-icon"><Check /></span>
               <span>Sin compromiso</span>
             </CtaFeature>
             <CtaFeature>
-              <span className="check-icon">✓</span>
+              <span className="check-icon"><Check /></span>
               <span>Acceso inmediato</span>
             </CtaFeature>
           </CtaFeatures>

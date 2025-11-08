@@ -3,11 +3,15 @@ import Header from './Header';
 import ContentArea from './ContentArea';
 import Footer from './Footer';
 
-const LandingPage = () => {
+const LandingPage = ({ isLoginModalOpen, onOpenLoginModal, onCloseLoginModal }) => {
   return (
     <div className="landing-page">
-      <Header />
-      <ContentArea />
+      <Header
+        isLoginModalOpen={isLoginModalOpen}
+        onOpenLoginModal={onOpenLoginModal}
+        onCloseLoginModal={onCloseLoginModal}
+      />
+      <ContentArea onOpenLoginModal={onOpenLoginModal} />
       <Footer />
     </div>
   );

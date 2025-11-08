@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { TrendingUp, BookOpen, BarChart3, TrendingDown, Coins, Zap, Globe, Cpu, Smartphone } from 'lucide-react';
 import {
   HeroSection as HeroSectionStyled,
   HeroContent,
@@ -17,7 +18,9 @@ import {
   TradeInfo,
   TradeSymbol,
   TradeResult,
-  TradeDetails
+  TradeDetails,
+  FloatingIcon,
+  FloatingLogo
 } from '../styled/HeroStyles';
 
 const HeroSection = () => {
@@ -63,19 +66,19 @@ const HeroSection = () => {
               <HeroFeatures>
                 <motion.div variants={itemVariants}>
                   <FeatureItem>
-                    <FeatureIcon>📊</FeatureIcon>
+                    <FeatureIcon><TrendingUp size={28} /></FeatureIcon>
                     <span>Seguimiento de Trades</span>
                   </FeatureItem>
                 </motion.div>
                 <motion.div variants={itemVariants}>
                   <FeatureItem>
-                    <FeatureIcon>📝</FeatureIcon>
+                    <FeatureIcon><BookOpen size={28} /></FeatureIcon>
                     <span>Anotaciones Detalladas</span>
                   </FeatureItem>
                 </motion.div>
                 <motion.div variants={itemVariants}>
                   <FeatureItem>
-                    <FeatureIcon>📈</FeatureIcon>
+                    <FeatureIcon><BarChart3 size={28} /></FeatureIcon>
                     <span>Análisis de Resultados</span>
                   </FeatureItem>
                 </motion.div>
@@ -118,6 +121,34 @@ const HeroSection = () => {
             </HeroImage>
           </motion.div>
         </HeroContent>
+        
+        {/* Floating trading icons */}
+        <FloatingIcon className="icon-1">
+          <TrendingUp />
+        </FloatingIcon>
+        <FloatingIcon className="icon-2">
+          <BarChart3 />
+        </FloatingIcon>
+        <FloatingIcon className="icon-3">
+          <Coins />
+        </FloatingIcon>
+        
+        {/* Floating trading company logos scattered around */}
+        <FloatingLogo className="logo-1">
+          <Zap size={28} />
+        </FloatingLogo>
+        <FloatingLogo className="logo-2">
+          <Globe size={28} />
+        </FloatingLogo>
+        <FloatingLogo className="logo-3">
+          <Coins size={28} />
+        </FloatingLogo>
+        <FloatingLogo className="logo-4">
+          <Smartphone size={28} />
+        </FloatingLogo>
+        <FloatingLogo className="logo-5">
+          <Cpu size={28} />
+        </FloatingLogo>
       </motion.div>
     </HeroSectionStyled>
   );

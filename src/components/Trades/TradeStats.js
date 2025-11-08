@@ -19,7 +19,7 @@ import {
 import { colors } from '../../styles/colors';
 import { getSymbolData } from '../../config/marketData';
 import priceService from '../../services/priceService';
-import finnhubService from '../../services/finnhubService';
+import marketBenchmarksService from '../../services/marketBenchmarksService';
 
 const StatsContainer = styled.div`
   background: ${colors.white};
@@ -203,31 +203,17 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
   const fetchSPYYTDPerformance = async () => {
     try {
       setSpyData({ ytdPerformance: null, loading: true, error: null });
-      
-      console.log('📊 Calculando SPY YTD Performance en modo demo...');
-      
-      // En modo demo, usar valores simulados
-      const spyClosingPrice2024 = 595.00; // Precio de cierre aproximado del 30 de diciembre de 2024
-      const currentPrice = 610.50; // Precio simulado actual (aproximadamente +2.6% YTD)
-      
-      // Calcular rendimiento YTD
-      const ytdPerformance = ((currentPrice - spyClosingPrice2024) / spyClosingPrice2024) * 100;
-      
-      console.log('📈 SPY YTD Performance (simulado):', {
-        precioBase2024: spyClosingPrice2024,
-        precioActual: currentPrice,
-        rendimiento: ytdPerformance.toFixed(2) + '%'
-      });
-      
+
+      const ytdPerformance = await marketBenchmarksService.getSPYYTDPerformance();
+
       setSpyData({
-        ytdPerformance: ytdPerformance,
+        ytdPerformance,
         loading: false,
         error: null
       });
-      
     } catch (error) {
       console.error('❌ Error calculando SPY YTD performance:', error);
-      
+
       setSpyData({
         ytdPerformance: null,
         loading: false,

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { LayoutDashboard, BookOpen, LogOut, LogIn } from 'lucide-react';
 import LoginModal from './LoginModal';
 import { useStrapiAuth } from '../../hooks/useStrapiTrades';
 import {
@@ -11,18 +12,9 @@ import {
   LoginButton
 } from './styled/HeaderStyles';
 
-const Header = () => {
+const Header = ({ isLoginModalOpen, onOpenLoginModal, onCloseLoginModal }) => {
   const navigate = useNavigate();
   const { user, logout } = useStrapiAuth();
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-
-  const handleLoginClick = () => {
-    setIsLoginModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsLoginModalOpen(false);
-  };
 
   const handleDashboardClick = () => {
     navigate('/dashboard');
@@ -58,25 +50,29 @@ const Header = () => {
           // Usuario autenticado - mostrar opciones de navegación y logout
           <>
             <LoginButton onClick={handleDashboardClick} style={{ marginRight: '1rem' }}>
-              📊 Dashboard
+              <LayoutDashboard size={18} />
+              Dashboard
             </LoginButton>
             <LoginButton onClick={handleTradesClick} style={{ marginRight: '1rem' }}>
-              📝 Trades
+              <BookOpen size={18} />
+              Trades
             </LoginButton>
             <LoginButton onClick={handleLogoutClick} style={{ background: '#e74c3c' }}>
+              <LogOut size={18} />
               Cerrar Sesión
             </LoginButton>
           </>
         ) : (
           // Usuario no autenticado - mostrar botón de login
-          <LoginButton onClick={handleLoginClick}>
+          <LoginButton onClick={onOpenLoginModal}>
+            <LogIn size={18} />
             Iniciar Sesión
           </LoginButton>
         )}
       </HeaderActions>
 
       {isLoginModalOpen && (
-        <LoginModal onClose={handleCloseModal} />
+        <LoginModal onClose={onCloseLoginModal} />
       )}
     </HeaderContainer>
   );

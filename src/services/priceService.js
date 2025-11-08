@@ -19,6 +19,8 @@ class PriceService {
 
   // Método genérico para obtener precio actual
   async getCurrentPrice(symbol) {
+    const cacheKey = symbol.toUpperCase();
+    
     try {
       // Si está en modo demo, generar precio mock directamente
       if (this.config.demoMode) {
@@ -29,12 +31,11 @@ class PriceService {
       }
       
       // Verificar cache primero
-      const cacheKey = symbol.toUpperCase();
       const cached = this.cache.get(cacheKey);
       
       if (cached && Date.now() - cached.timestamp < this.cacheExpiry) {
         const minutesOld = Math.round((Date.now() - cached.timestamp) / (1000 * 60));
-        const priceType = cached.isMock ? 'mock' : 'real';
+        const priceType = cached.isMock ? 'mock' : (cached.isDelayed ? 'delayed' : 'real');
         console.log(`📦 Cache hit para ${symbol}: $${cached.price} (${minutesOld} min antiguo, ${priceType})`);
         return cached.price;
       }
@@ -45,62 +46,10 @@ class PriceService {
         return await this.pendingRequests.get(cacheKey);
       }
 
-      console.log(`🔍 Obteniendo precio para ${symbol} desde ${this.config.provider}`);
+      console.log(`🔍 Obteniendo precio para ${symbol}`);
       
       // Crear promesa para la request y guardarla
-      const requestPromise = (async () => {
-        try {
-          // Si el proveedor es Yahoo, usar el servicio dedicado
-          if (this.config.provider === 'yahoo') {
-            try {
-              const quote = await yahooFinanceService.getQuote(symbol);
-              const currentPrice = quote.price;
-              
-              // Guardar en cache
-              this.cache.set(cacheKey, {
-                price: currentPrice,
-                timestamp: Date.now()
-              });
-
-              console.log(`💰 Yahoo Finance - Precio ${symbol}: $${currentPrice}`);
-              return currentPrice;
-            } catch (yahooError) {
-              console.warn(`⚠️ Yahoo Finance falló para ${symbol}, intentando con método genérico...`);
-              // Continuar con el método genérico como fallback
-            }
-          }
-          
-          // Construir URL según el proveedor configurado
-          const url = buildPriceUrl(symbol, this.config.provider, this.config.apiKey);
-          
-          const response = await fetch(url);
-          
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: Error fetching price for ${symbol}`);
-          }
-
-          const data = await response.json();
-          
-          // Extraer precio según el proveedor
-          const currentPrice = extractPriceFromResponse(data, this.config.provider);
-          
-          if (!currentPrice || isNaN(currentPrice)) {
-            throw new Error(`Invalid price data for ${symbol}`);
-          }
-          
-          // Guardar en cache
-          this.cache.set(cacheKey, {
-            price: currentPrice,
-            timestamp: Date.now()
-          });
-
-          console.log(`💰 Precio ${symbol}: $${currentPrice}`);
-          return currentPrice;
-        } finally {
-          // Limpiar request pendiente
-          this.pendingRequests.delete(cacheKey);
-        }
-      })();
+      const requestPromise = this.fetchPriceWithFallback(symbol, cacheKey);
 
       // Guardar la promesa como request pendiente
       this.pendingRequests.set(cacheKey, requestPromise);
@@ -117,21 +66,82 @@ class PriceService {
       
       // Generar precio mock en caso de error
       console.log(`🎭 Generando precio mock para ${symbol} debido a error de API`);
-      console.log(`🎭 Tipo de error:`, error.message);
-      
       const mockPrice = this.generateMockPrice(symbol);
       
       // Guardar precio mock en cache
-      const cacheKey = `${symbol.toUpperCase()}_${this.config.provider}`;
       this.cache.set(cacheKey, {
         price: mockPrice,
         timestamp: Date.now(),
-        isMock: true // Marcar como precio mock
+        isMock: true
       });
       
       console.log(`🎭 Precio mock generado para ${symbol}: $${mockPrice}`);
       return mockPrice;
     }
+  }
+
+  // Método con fallback en cascada: Finnhub -> Yahoo (si se configuró) -> null/mock
+  async fetchPriceWithFallback(symbol, cacheKey) {
+    let lastError = null;
+
+    // Intentar con Finnhub primero (si no está en demoMode)
+    if (!this.config.demoMode && this.config.provider === 'finnhub') {
+      try {
+        const price = await this.fetchFromFinnhub(symbol);
+        this.cache.set(cacheKey, {
+          price,
+          timestamp: Date.now(),
+          isDelayed: false
+        });
+        this.pendingRequests.delete(cacheKey);
+        console.log(`✅ Finnhub - Precio ${symbol}: $${price}`);
+        return price;
+      } catch (error) {
+        lastError = error;
+        console.warn(`⚠️ Finnhub falló para ${symbol}:`, error.message);
+      }
+    }
+
+    // Intentar con Yahoo Finance (solo posible si hay backend que evite CORS)
+    try {
+      const quote = await yahooFinanceService.getQuote(symbol);
+      if (quote?.price) {
+        const price = quote.price;
+        this.cache.set(cacheKey, {
+          price,
+          timestamp: Date.now(),
+          isDelayed: true
+        });
+        this.pendingRequests.delete(cacheKey);
+        console.log(`✅ Yahoo Finance (delayed) - Precio ${symbol}: $${price}`);
+        return price;
+      }
+    } catch (error) {
+      lastError = error;
+      console.warn(`⚠️ Yahoo Finance falló para ${symbol}:`, error.message);
+    }
+
+    this.pendingRequests.delete(cacheKey);
+    throw lastError || new Error(`No se pudo obtener precio para ${symbol}`);
+  }
+
+  // Fetch desde Finnhub
+  async fetchFromFinnhub(symbol) {
+    const url = buildPriceUrl(symbol, 'finnhub', this.config.apiKey);
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    const price = extractPriceFromResponse(data, 'finnhub');
+    
+    if (!price || isNaN(price) || price <= 0) {
+      throw new Error('Invalid price data');
+    }
+    
+    return price;
   }
 
   // Método para obtener múltiples precios de una vez

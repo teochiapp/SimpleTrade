@@ -12,7 +12,21 @@ class StrapiService {
   initializeToken() {
     try {
       const storedToken = localStorage.getItem('strapi_token');
+      const tokenExpiry = localStorage.getItem('strapi_token_expiry');
+      
       if (storedToken && storedToken !== 'null' && storedToken !== 'undefined') {
+        // Verificar si el token expiró
+        if (tokenExpiry) {
+          const expiryTime = parseInt(tokenExpiry, 10);
+          const now = Date.now();
+          
+          if (now >= expiryTime) {
+            console.log(`🔓 Token expirado, limpiando...`);
+            this.clearToken();
+            return;
+          }
+        }
+        
         this.token = storedToken;
         console.log(`🔐 Token cargado desde localStorage:`, !!this.token);
       } else {
@@ -29,6 +43,11 @@ class StrapiService {
   setToken(token) {
     this.token = token;
     localStorage.setItem('strapi_token', token);
+    
+    // Guardar tiempo de expiración (7 días por defecto de Strapi)
+    const expiryTime = Date.now() + (7 * 24 * 60 * 60 * 1000);
+    localStorage.setItem('strapi_token_expiry', expiryTime.toString());
+    
     console.log(`🔐 Token saved:`, !!token);
   }
 
@@ -36,6 +55,8 @@ class StrapiService {
   clearToken() {
     this.token = null;
     localStorage.removeItem('strapi_token');
+    localStorage.removeItem('strapi_token_expiry');
+    localStorage.removeItem('strapi_user');
     console.log(`🔓 Token cleared`);
   }
 
@@ -192,15 +213,20 @@ class StrapiService {
   async updateTrade(tradeId, tradeData) {
     try {
       console.log(`🔄 Updating trade ${tradeId}...`);
+      
+      // Verificar autenticación ANTES de intentar actualizar
+      const isAuthenticated = await this.checkAuth();
+      if (!isAuthenticated) {
+        console.error('❌ No hay sesión válida');
+        alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+        this.clearToken();
+        window.location.reload();
+        throw new Error('Session expired - please login again');
+      }
+      
       console.log(`🔐 Token present:`, !!this.token);
       console.log(`🔑 Token value (first 20 chars):`, this.token ? this.token.substring(0, 20) + '...' : 'null');
       console.log(`📤 Headers:`, this.getHeaders());
-      
-      // Verificar que el token esté presente antes de hacer la request
-      if (!this.token) {
-        console.error('❌ No token found, user needs to login');
-        throw new Error('No authentication token found - please login again');
-      }
       
       const response = await fetch(`${this.baseURL}/trades/${tradeId}`, {
         method: 'PUT',
@@ -213,24 +239,16 @@ class StrapiService {
       if (!response.ok) {
         const errorData = await response.json();
         console.error(`❌ Update failed:`, response.status, errorData);
-        console.error(`❌ Full error response:`, errorData);
         
         if (response.status === 401) {
-          console.log('🔓 Token expired or invalid, clearing token and localStorage...');
+          console.log('🔓 Token expired or invalid');
           this.clearToken();
-          localStorage.removeItem('strapi_token');
-          localStorage.removeItem('strapi_user');
-          
-          // Mostrar una alerta al usuario
           alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
-          
-          // Recargar la página para forzar el login
-          window.location.reload();
-          
+          setTimeout(() => window.location.reload(), 500);
           throw new Error('Token expired - please login again');
         }
         
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
@@ -265,26 +283,17 @@ class StrapiService {
     try {
       console.log(`🔒 Iniciando cierre de trade ${tradeId}...`);
       
-      // 🔑 VERIFICACIÓN ESPECÍFICA DE TOKEN ANTES DE CERRAR TRADE
-      if (!this.token) {
-        console.error('❌ No hay token disponible para cerrar trade');
+      // Verificar autenticación antes de cerrar
+      const isAuthenticated = await this.checkAuth();
+      if (!isAuthenticated) {
+        console.error('❌ Sesión no válida al cerrar trade');
+        this.clearToken();
         alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
-        window.location.reload();
-        throw new Error('No authentication token - please login again');
+        setTimeout(() => window.location.reload(), 500);
+        throw new Error('Session expired - please login again');
       }
       
-      // Verificar que el token sigue siendo válido
-      console.log('🔍 Verificando validez del token antes de cerrar trade...');
-      const isValidToken = await this.checkAuth();
-      
-      if (!isValidToken) {
-        console.error('❌ Token inválido al intentar cerrar trade');
-        alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
-        window.location.reload();
-        throw new Error('Invalid token - please login again'); 
-      }
-      
-      console.log('✅ Token válido, procediendo a cerrar trade...');
+      console.log('✅ Sesión válida, procediendo a cerrar trade...');
       
       const tradeData = {
         exit_price: exitPrice,
@@ -301,13 +310,14 @@ class StrapiService {
       console.error('Error closing trade:', error);
       
       // Si es un error de autenticación, manejar específicamente
-      if (error.message.includes('Token') || error.message.includes('token') || error.message.includes('auth')) {
+      if (error.message.includes('Session') || error.message.includes('Token') || error.message.includes('expired')) {
         console.log('🔓 Error de autenticación detectado en closeTrade');
         this.clearToken();
-        localStorage.removeItem('strapi_token');
-        localStorage.removeItem('strapi_user');
-        alert('Tu sesión ha expirado. La página se recargará para que puedas iniciar sesión nuevamente.');
-        setTimeout(() => window.location.reload(), 1000);
+        // No mostrar alerta adicional si ya se mostró una
+        if (!error.message.includes('please login again')) {
+          alert('Tu sesión ha expirado. La página se recargará.');
+          setTimeout(() => window.location.reload(), 500);
+        }
       }
       
       throw error;
