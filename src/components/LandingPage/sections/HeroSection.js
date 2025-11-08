@@ -95,7 +95,7 @@ const HeroSection = () => {
                     <MockupTrade>
                       <TradeInfo>
                         <TradeSymbol>EUR/USD</TradeSymbol>
-                        <TradeResult positive>+$150</TradeResult>
+                        <TradeResult $positive>+$150</TradeResult>
                       </TradeInfo>
                       <TradeDetails>
                         <span>Entrada: 1.0850</span>

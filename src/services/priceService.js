@@ -1,15 +1,19 @@
 // services/priceService.js - Servicio para obtener precios en tiempo real
 import { priceConfig, buildPriceUrl, extractPriceFromResponse } from '../config/priceConfig';
+import yahooFinanceService from './yahooFinanceService';
 
 class PriceService {
   constructor() {
     this.config = priceConfig;
     this.cache = new Map(); // Cache para evitar muchas llamadas
-    this.cacheExpiry = 12 * 60 * 60 * 1000; // 12 horas de cache (la mitad de 24h para seguridad)
+    this.cacheExpiry = 4 * 60 * 60 * 1000; // 4 horas de cache (suficiente para trading diario)
+    this.pendingRequests = new Map(); // Para evitar requests duplicados
     
     console.log('🔧 PriceService inicializado con:', {
       provider: this.config.provider,
-      hasApiKey: !!this.config.apiKey && this.config.apiKey !== 'demo'
+      hasApiKey: !!this.config.apiKey && this.config.apiKey !== 'demo',
+      gracefulDegradation: this.config.gracefulDegradation,
+      cacheExpiry: '4 horas'
     });
   }
 
@@ -29,42 +33,87 @@ class PriceService {
       const cached = this.cache.get(cacheKey);
       
       if (cached && Date.now() - cached.timestamp < this.cacheExpiry) {
-        const hoursOld = Math.round((Date.now() - cached.timestamp) / (1000 * 60 * 60));
+        const minutesOld = Math.round((Date.now() - cached.timestamp) / (1000 * 60));
         const priceType = cached.isMock ? 'mock' : 'real';
-        console.log(`📦 Cache hit para ${symbol}: $${cached.price} (${hoursOld}h antiguo, ${priceType})`);
+        console.log(`📦 Cache hit para ${symbol}: $${cached.price} (${minutesOld} min antiguo, ${priceType})`);
         return cached.price;
+      }
+
+      // Verificar si ya hay una request pendiente para este símbolo
+      if (this.pendingRequests.has(cacheKey)) {
+        console.log(`⏳ Request pendiente para ${symbol}, esperando...`);
+        return await this.pendingRequests.get(cacheKey);
       }
 
       console.log(`🔍 Obteniendo precio para ${symbol} desde ${this.config.provider}`);
       
-      // Construir URL según el proveedor configurado
-      const url = buildPriceUrl(symbol, this.config.provider, this.config.apiKey);
-      
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: Error fetching price for ${symbol}`);
-      }
+      // Crear promesa para la request y guardarla
+      const requestPromise = (async () => {
+        try {
+          // Si el proveedor es Yahoo, usar el servicio dedicado
+          if (this.config.provider === 'yahoo') {
+            try {
+              const quote = await yahooFinanceService.getQuote(symbol);
+              const currentPrice = quote.price;
+              
+              // Guardar en cache
+              this.cache.set(cacheKey, {
+                price: currentPrice,
+                timestamp: Date.now()
+              });
 
-      const data = await response.json();
-      
-      // Extraer precio según el proveedor
-      const currentPrice = extractPriceFromResponse(data, this.config.provider);
-      
-      if (!currentPrice || isNaN(currentPrice)) {
-        throw new Error(`Invalid price data for ${symbol}`);
-      }
-      
-      // Guardar en cache
-      this.cache.set(cacheKey, {
-        price: currentPrice,
-        timestamp: Date.now()
-      });
+              console.log(`💰 Yahoo Finance - Precio ${symbol}: $${currentPrice}`);
+              return currentPrice;
+            } catch (yahooError) {
+              console.warn(`⚠️ Yahoo Finance falló para ${symbol}, intentando con método genérico...`);
+              // Continuar con el método genérico como fallback
+            }
+          }
+          
+          // Construir URL según el proveedor configurado
+          const url = buildPriceUrl(symbol, this.config.provider, this.config.apiKey);
+          
+          const response = await fetch(url);
+          
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: Error fetching price for ${symbol}`);
+          }
 
-      console.log(`💰 Precio ${symbol}: $${currentPrice}`);
-      return currentPrice;
+          const data = await response.json();
+          
+          // Extraer precio según el proveedor
+          const currentPrice = extractPriceFromResponse(data, this.config.provider);
+          
+          if (!currentPrice || isNaN(currentPrice)) {
+            throw new Error(`Invalid price data for ${symbol}`);
+          }
+          
+          // Guardar en cache
+          this.cache.set(cacheKey, {
+            price: currentPrice,
+            timestamp: Date.now()
+          });
+
+          console.log(`💰 Precio ${symbol}: $${currentPrice}`);
+          return currentPrice;
+        } finally {
+          // Limpiar request pendiente
+          this.pendingRequests.delete(cacheKey);
+        }
+      })();
+
+      // Guardar la promesa como request pendiente
+      this.pendingRequests.set(cacheKey, requestPromise);
+      
+      return await requestPromise;
     } catch (error) {
       console.error(`❌ Error getting price for ${symbol}:`, error);
+      
+      // Si gracefulDegradation está activado, retornar null en lugar de mock
+      if (this.config.gracefulDegradation) {
+        console.log(`⚠️ Graceful degradation activado - retornando null para ${symbol}`);
+        return null;
+      }
       
       // Generar precio mock en caso de error
       console.log(`🎭 Generando precio mock para ${symbol} debido a error de API`);

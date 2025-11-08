@@ -9,9 +9,10 @@ export const PRICE_PROVIDERS = {
 
 export const priceConfig = {
   // Configuración por defecto
-  provider: process.env.REACT_APP_PRICE_API_PROVIDER || PRICE_PROVIDERS.FINNHUB,
-  apiKey: process.env.REACT_APP_PRICE_API_KEY || 'd3t6mg9r01qqdgfufaggd3t6mg9r01qqdgfufah0', // Finnhub API key
-  demoMode: true, // Si es true, usa precios mock en lugar de APIs reales (TEMPORALMENTE ACTIVADO)
+  provider: process.env.REACT_APP_PRICE_API_PROVIDER || PRICE_PROVIDERS.YAHOO, // Cambiado a Yahoo Finance (GRATIS, sin API key)
+  apiKey: process.env.REACT_APP_PRICE_API_KEY || 'd3t6mg9r01qqdgfufaggd3t6mg9r01qqdgfufah0', // Finnhub API key (backup)
+  demoMode: true, // ACTIVADO: Usa precios mock (Yahoo Finance tiene CORS issues)
+  gracefulDegradation: true, // Si falla la API, mostrar dashboard sin precios en lugar de error
   
   // URLs base por proveedor
   baseUrls: {

@@ -56,22 +56,22 @@ const Tab = styled.button`
   flex: 1;
   padding: 1rem;
   border: none;
-  background: ${props => props.active ? colors.white : 'transparent'};
-  color: ${props => props.active ? colors.black : colors.gray[600]};
+  background: ${props => props.$active ? colors.white : 'transparent'};
+  color: ${props => props.$active ? colors.black : colors.gray[600]};
   font-size: 1rem;
   font-weight: 500;
   font-family: 'Unbounded', sans-serif;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: ${props => props.active ? '0 2px 8px rgba(0, 0, 0, 0.1)' : 'none'};
+  box-shadow: ${props => props.$active ? '0 2px 8px rgba(0, 0, 0, 0.1)' : 'none'};
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
 
   &:hover {
-    background: ${props => props.active ? colors.white : colors.gray[100]};
+    background: ${props => props.$active ? colors.white : colors.gray[100]};
   }
 `;
 
@@ -138,42 +138,42 @@ const TradeLogs = () => {
 
       <TabContainer>
         <Tab 
-          active={activeTab === 'stats' ? 'true' : 'false'} 
+          $active={activeTab === 'stats'} 
           onClick={() => setActiveTab('stats')}
         >
           <TrendingUp size={20} />
           Resumen
         </Tab>
         <Tab 
-          active={activeTab === 'portfolio' ? 'true' : 'false'} 
+          $active={activeTab === 'portfolio'} 
           onClick={() => setActiveTab('portfolio')}
         >
           <PieChart size={20} />
           Portfolio
         </Tab>
         <Tab 
-          active={activeTab === 'form' ? 'true' : 'false'} 
+          $active={activeTab === 'form'} 
           onClick={() => setActiveTab('form')}
         >
           <PlusCircle size={20} />
           Nuevo Trade
         </Tab>
         <Tab 
-          active={activeTab === 'list' ? 'true' : 'false'} 
+          $active={activeTab === 'list'} 
           onClick={() => setActiveTab('list')}
         >
           <History size={20} />
           Historial
         </Tab>
         <Tab 
-          active={activeTab === 'diversification' ? 'true' : 'false'} 
+          $active={activeTab === 'diversification'} 
           onClick={() => setActiveTab('diversification')}
         >
           <PieChart size={20} />
           Diversificación
         </Tab>
         <Tab 
-          active={activeTab === 'screener' ? 'true' : 'false'} 
+          $active={activeTab === 'screener'} 
           onClick={() => setActiveTab('screener')}
         >
           <Search size={20} />

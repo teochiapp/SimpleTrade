@@ -112,13 +112,13 @@ const LoginModal = ({ onClose }) => {
         
         <TabContainer>
           <Tab 
-            active={mode === 'login'} 
+            $active={mode === 'login'} 
             onClick={() => handleModeChange('login')}
           >
             Iniciar Sesión
           </Tab>
           <Tab 
-            active={mode === 'register'} 
+            $active={mode === 'register'} 
             onClick={() => handleModeChange('register')}
           >
             Registro
@@ -172,7 +172,7 @@ const LoginModal = ({ onClose }) => {
           
           <StyledButton 
             type="submit" 
-            primary 
+            $primary 
             disabled={isLoading}
             style={{ width: '100%' }}
           >

@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 
 export const StyledButton = styled.button`
-  background: ${props => props.primary ? '#3498db' : 'transparent'};
-  color: ${props => props.primary ? 'white' : '#3498db'};
-  border: ${props => props.primary ? 'none' : '2px solid #3498db'};
+  background: ${props => props.$primary ? '#3498db' : 'transparent'};
+  color: ${props => props.$primary ? 'white' : '#3498db'};
+  border: ${props => props.$primary ? 'none' : '2px solid #3498db'};
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   font-size: 1rem;
@@ -16,7 +16,7 @@ export const StyledButton = styled.button`
   gap: 0.5rem;
   
   &:hover {
-    background: ${props => props.primary ? '#2980b9' : '#3498db'};
+    background: ${props => props.$primary ? '#2980b9' : '#3498db'};
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);

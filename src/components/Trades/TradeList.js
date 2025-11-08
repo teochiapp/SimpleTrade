@@ -42,7 +42,7 @@ const StatValue = styled.div`
   font-size: 1.5rem;
   font-weight: 700;
   font-family: 'Unbounded', sans-serif;
-  color: ${props => props.positive ? '#27ae60' : props.negative ? '#e74c3c' : '#2c3e50'};
+  color: ${props => props.$positive ? '#27ae60' : props.$negative ? '#e74c3c' : '#2c3e50'};
 `;
 
 const StatLabel = styled.div`
@@ -126,7 +126,7 @@ const TradeResult = styled.div`
   font-size: 1.1rem;
   font-weight: 700;
   font-family: 'Unbounded', sans-serif;
-  color: ${props => props.positive ? '#27ae60' : '#e74c3c'};
+  color: ${props => props.$positive ? '#27ae60' : '#e74c3c'};
 `;
 
 const TradeDetails = styled.div`
@@ -339,7 +339,7 @@ const TradeList = ({ trades, loading, error, onTradeDeleted }) => {
                       {trade.attributes.symbol} - {trade.attributes.type === 'buy' ? 'Compra' : 'Venta'}
                     </TradeSymbol>
                     <div>
-                      <TradeResult positive={trade.attributes.result >= 0}>
+                      <TradeResult $positive={trade.attributes.result >= 0}>
                         {trade.attributes.result ? formatCurrency(trade.attributes.result) : 'Abierto'}
                       </TradeResult>
                       <ActionButton 

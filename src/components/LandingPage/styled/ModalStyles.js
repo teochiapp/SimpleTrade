@@ -116,17 +116,17 @@ export const Tab = styled.button`
   flex: 1;
   padding: 1rem;
   border: none;
-  background: ${props => props.active ? '#3498db' : 'transparent'};
-  color: ${props => props.active ? 'white' : '#7f8c8d'};
+  background: ${props => props.$active ? '#3498db' : 'transparent'};
+  color: ${props => props.$active ? 'white' : '#7f8c8d'};
   font-size: 1rem;
   font-weight: 500;
   font-family: 'Unbounded', sans-serif;
   cursor: pointer;
   transition: all 0.3s ease;
-  border-bottom: 3px solid ${props => props.active ? '#3498db' : 'transparent'};
+  border-bottom: 3px solid ${props => props.$active ? '#3498db' : 'transparent'};
 
   &:hover {
-    background: ${props => props.active ? '#3498db' : '#f8f9fa'};
+    background: ${props => props.$active ? '#3498db' : '#f8f9fa'};
   }
 
   &:first-child {

@@ -673,7 +673,7 @@ const ClosedTradesHistory = ({ closedTrades, loading, error, onDeleteTrade }) =>
                 <TradeHeaderRight>
                   <TradeResult $positive={calculateTradeResult(trade) >= 0}>
                     {formatPercentage(calculateTradeResult(trade))}%
-                </TradeResult>
+                  </TradeResult>
                   <DeleteButton 
                     onClick={(e) => {
                       e.stopPropagation(); // Evitar que se abra el modal

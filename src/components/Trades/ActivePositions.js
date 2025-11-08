@@ -593,6 +593,7 @@ const ActivePositions = ({ openTrades, loading, error, onCloseTrade }) => {
                   <CurrentPrice>
                     {(() => {
                       const currentPrice = getPrice(getTradeAttr(trade, 'symbol'));
+                      if (currentPrice === null) return <span style={{ color: '#95a5a6', fontSize: '0.9rem' }}>No disponible</span>;
                       return currentPrice ? formatCurrency(currentPrice) : 'Cargando...';
                     })()}
                   </CurrentPrice>
@@ -606,7 +607,7 @@ const ActivePositions = ({ openTrades, loading, error, onCloseTrade }) => {
                         <PnLIcon>
                           {pnl > 0 ? '📈' : pnl < 0 ? '📉' : '➖'}
                         </PnLIcon>
-                        {pnl !== null ? `${pnl > 0 ? '+' : ''}${pnl.toFixed(2)}%` : 'N/A'}
+                        {pnl !== null && pnl !== 0 ? `${pnl > 0 ? '+' : ''}${pnl.toFixed(2)}%` : <span style={{ color: '#95a5a6', fontSize: '0.9rem' }}>No disponible</span>}
                       </UnrealizedPnL>
                     );
                   })()}

@@ -12,8 +12,12 @@ module.exports = [
         'https://admin.simplitrade.surcodes.com', // Admin panel
         'http://localhost:3000',                // Frontend desarrollo
         'http://localhost:3001',                // Frontend desarrollo alternativo
-        'http://localhost:1337'                // Backend local
-      ]
+        'http://localhost:1337',                // Backend local
+        'http://127.0.0.1:3000',                // Frontend desarrollo (127.0.0.1)
+        'http://127.0.0.1:3001'                 // Frontend desarrollo alternativo (127.0.0.1)
+      ],
+      credentials: true,
+      keepHeaderOnError: true
     }
   },
   'strapi::poweredBy',

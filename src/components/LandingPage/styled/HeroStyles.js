@@ -125,8 +125,8 @@ export const TradeResult = styled.span`
   font-weight: 700;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
-  background: ${props => props.positive ? '#d4edda' : '#f8d7da'};
-  color: ${props => props.positive ? '#155724' : '#721c24'};
+  background: ${props => props.$positive ? '#d4edda' : '#f8d7da'};
+  color: ${props => props.$positive ? '#155724' : '#721c24'};
 `;
 
 export const TradeDetails = styled.div`

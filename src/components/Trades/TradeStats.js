@@ -201,49 +201,19 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
 
   // Función para obtener rendimiento YTD del SPY dinámicamente
   const fetchSPYYTDPerformance = async () => {
-    console.log('🔍 Cargando SPY YTD performance dinámicamente...');
-    
     try {
-      // Precio de cierre de SPY del último día de trading de 2024 (30 de diciembre, 2024)
-      let spyClosingPrice2024 = 572.57; // Precio aproximado del último día de trading 2024
+      setSpyData({ ytdPerformance: null, loading: true, error: null });
       
-      // Intentar obtener el precio histórico real del 30 de diciembre de 2024
-      try {
-        console.log('🔍 Intentando obtener precio histórico de SPY desde Finnhub...');
-        
-        // Fecha del último día de trading de 2024 (30 de diciembre)
-        const lastTradingDay2024 = Math.floor(new Date('2024-12-30').getTime() / 1000);
-        const nextDay = Math.floor(new Date('2024-12-31').getTime() / 1000);
-        
-        const historicalData = await finnhubService.getCandles('SPY', 'D', lastTradingDay2024, nextDay);
-        
-        if (historicalData && historicalData.length > 0) {
-          const lastCandle = historicalData[historicalData.length - 1];
-          spyClosingPrice2024 = lastCandle.close;
-          console.log('✅ Precio histórico obtenido desde Finnhub:', spyClosingPrice2024);
-        } else {
-          console.log('⚠️ No se pudo obtener datos históricos, usando precio aproximado');
-        }
-      } catch (histError) {
-        console.log('⚠️ Error obteniendo precio histórico, usando precio aproximado:', histError.message);
-      }
+      console.log('📊 Calculando SPY YTD Performance en modo demo...');
       
-      console.log('📊 Precio de cierre SPY 2024 (base):', spyClosingPrice2024);
+      // En modo demo, usar valores simulados
+      const spyClosingPrice2024 = 595.00; // Precio de cierre aproximado del 30 de diciembre de 2024
+      const currentPrice = 610.50; // Precio simulado actual (aproximadamente +2.6% YTD)
       
-      // Obtener precio actual usando nuestro priceService
-      console.log('🔄 Obteniendo precio actual de SPY...');
-      const currentPrice = await priceService.getCurrentPrice('SPY');
-      
-      if (!currentPrice || isNaN(currentPrice)) {
-        throw new Error('No se pudo obtener el precio actual de SPY');
-      }
-      
-      console.log('💰 Precio actual SPY:', currentPrice);
-      
-      // Calcular rendimiento YTD: ((precio_actual - precio_inicio_año) / precio_inicio_año) * 100
+      // Calcular rendimiento YTD
       const ytdPerformance = ((currentPrice - spyClosingPrice2024) / spyClosingPrice2024) * 100;
       
-      console.log('📈 SPY YTD Performance calculado:', {
+      console.log('📈 SPY YTD Performance (simulado):', {
         precioBase2024: spyClosingPrice2024,
         precioActual: currentPrice,
         rendimiento: ytdPerformance.toFixed(2) + '%'
@@ -258,13 +228,10 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
     } catch (error) {
       console.error('❌ Error calculando SPY YTD performance:', error);
       
-      // Fallback: usar un valor estimado si falla completamente
-      console.log('🔄 Usando valor fallback para SPY YTD...');
-      
       setSpyData({
-        ytdPerformance: 15.2, // Valor fallback estimado
+        ytdPerformance: null,
         loading: false,
-        error: null
+        error: 'No disponible'
       });
     }
   };
@@ -640,7 +607,7 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
             <StatCard variants={cardVariants}>
               <StatIcon color={
                 spyData.loading ? colors.gray[400] :
-                spyData.error ? colors.gray[400] :
+                spyData.error || spyData.ytdPerformance === null ? colors.gray[400] :
                 spyData.ytdPerformance > 0 ? colors.trading.profit : colors.trading.loss
               }>
                 <LineChart />
@@ -651,10 +618,10 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
                     <StatValue>...</StatValue>
                     <StatLabel>Cargando SPY YTD</StatLabel>
                   </>
-                ) : spyData.error ? (
+                ) : spyData.error || spyData.ytdPerformance === null ? (
                   <>
-                    <StatValue>N/A</StatValue>
-                    <StatLabel>Error SPY YTD</StatLabel>
+                    <StatValue style={{ fontSize: '0.9rem', color: colors.gray[500] }}>No disponible</StatValue>
+                    <StatLabel>SPY Rendimiento YTD</StatLabel>
                   </>
                 ) : (
                   <>
