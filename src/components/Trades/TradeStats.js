@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { 
@@ -39,6 +39,19 @@ const StatsContainer = styled.div`
     background: linear-gradient(90deg, ${colors.primary}, ${colors.secondary});
   }
 `;
+
+const DEFAULT_STATS = {
+  totalTrades: 0,
+  openTrades: 0,
+  closedTrades: 0,
+  winningTrades: 0,
+  losingTrades: 0,
+  winRate: 0,
+  totalProfit: 0,
+  averageWin: 0,
+  averageLoss: 0,
+  profitFactor: 0,
+};
 
 const TabsContainer = styled.div`
   display: flex;
@@ -227,7 +240,7 @@ const EmptyText = styled.p`
   margin: 0;
 `;
 
-const TradeStats = ({ stats, openTrades, loading, error }) => {
+const TradeStats = ({ stats: _globalStats, trades = [], openTrades: _openTrades = [], loading, error }) => {
   const [activeTab, setActiveTab] = useState('swing'); // 'swing' o 'day'
   const [spyData, setSpyData] = useState({
     ytdPerformance: null,
@@ -309,22 +322,73 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
     });
   };
 
-  // Obtener trades filtrados según tab activa
-  const getFilteredTrades = () => {
-    if (activeTab === 'swing') {
-      return filterTradesByStrategy(openTrades, 'swing_trading');
-    } else {
-      return filterTradesByStrategy(openTrades, 'day_trading');
+  const strategyKey = activeTab === 'swing' ? 'swing_trading' : 'day_trading';
+
+  const filteredTrades = useMemo(
+    () => filterTradesByStrategy(trades, strategyKey),
+    [trades, strategyKey]
+  );
+
+  const filteredOpenTrades = useMemo(
+    () => filteredTrades.filter(trade => getTradeAttr(trade, 'status') === 'open'),
+    [filteredTrades]
+  );
+
+  const getTradeResultPercentage = (trade) => {
+    const storedResult = getTradeAttr(trade, 'result');
+    if (storedResult != null && !isNaN(storedResult)) {
+      return Number(storedResult);
     }
+
+    const entryPrice = parseFloat(getTradeAttr(trade, 'entry_price'));
+    const exitPrice = parseFloat(getTradeAttr(trade, 'exit_price'));
+    const type = getTradeAttr(trade, 'type');
+
+    if (!entryPrice || !exitPrice) return 0;
+
+    if (type === 'buy') {
+      return ((exitPrice - entryPrice) / entryPrice) * 100;
+    }
+
+    return ((entryPrice - exitPrice) / entryPrice) * 100;
   };
 
-  const filteredOpenTrades = getFilteredTrades();
+  const computeStatsForTrades = (tradesList) => {
+    if (!tradesList || tradesList.length === 0) {
+      return { ...DEFAULT_STATS };
+    }
 
-  // Calcular estadísticas filtradas por estrategia
-  // Nota: stats viene del hook y contiene TODOS los trades
-  // Aquí mostramos las stats globales pero filtramos solo las métricas de diversificación
-  // Si quisieras filtrar también las stats, necesitarías recalcularlas aquí
-  // Por ahora, las stats generales muestran todos los trades independientemente de la tab
+    const open = tradesList.filter(trade => getTradeAttr(trade, 'status') === 'open');
+    const closed = tradesList.filter(trade => getTradeAttr(trade, 'status') === 'closed');
+
+    const closedResults = closed.map(trade => getTradeResultPercentage(trade));
+    const winningResults = closedResults.filter(result => result > 0);
+    const losingResults = closedResults.filter(result => result < 0);
+
+    const totalWins = winningResults.reduce((sum, result) => sum + result, 0);
+    const totalLosses = losingResults.reduce((sum, result) => sum + Math.abs(result), 0);
+    const totalProfit = closedResults.reduce((sum, result) => sum + result, 0);
+
+    return {
+      totalTrades: tradesList.length,
+      openTrades: open.length,
+      closedTrades: closed.length,
+      winningTrades: winningResults.length,
+      losingTrades: losingResults.length,
+      winRate: closed.length > 0 ? (winningResults.length / closed.length) * 100 : 0,
+      totalProfit,
+      averageWin: winningResults.length > 0 ? totalWins / winningResults.length : 0,
+      averageLoss: losingResults.length > 0 ? totalLosses / losingResults.length : 0,
+      profitFactor: totalLosses > 0 ? totalWins / totalLosses : 0,
+    };
+  };
+
+  const displayStats = useMemo(
+    () => computeStatsForTrades(filteredTrades),
+    [filteredTrades]
+  );
+
+  const currentTabLabel = activeTab === 'swing' ? 'Swing Trading' : 'Day Trading';
 
   // MÉTRICAS DE DIVERSIFICACIÓN
 
@@ -580,7 +644,7 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
         </Tab>
       </TabsContainer>
 
-      {stats && stats.totalTrades > 0 ? (
+      {filteredTrades.length > 0 ? (
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -592,7 +656,7 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
                 <CheckSquare />
               </StatIcon>
               <StatContent>
-                <StatValue>{stats.totalTrades}</StatValue>
+                <StatValue>{displayStats.totalTrades}</StatValue>
                 <StatLabel>Total Trades Realizados</StatLabel>
               </StatContent>
             </StatCard>
@@ -602,7 +666,7 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
                 <Clock />
               </StatIcon>
               <StatContent>
-                <StatValue>{stats.openTrades}</StatValue>
+                <StatValue>{displayStats.openTrades}</StatValue>
                 <StatLabel>Trades Activos</StatLabel>
               </StatContent>
             </StatCard>
@@ -612,7 +676,7 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
                 <CheckCircle />
               </StatIcon>
               <StatContent>
-                <StatValue>{stats.winningTrades}</StatValue>
+                <StatValue>{displayStats.winningTrades}</StatValue>
                 <StatLabel>Trades Ganadores</StatLabel>
               </StatContent>
             </StatCard>
@@ -622,33 +686,33 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
                 <XCircle />
               </StatIcon>
               <StatContent>
-                <StatValue>{stats.losingTrades}</StatValue>
+                <StatValue>{displayStats.losingTrades}</StatValue>
                 <StatLabel>Trades Perdedores</StatLabel>
               </StatContent>
             </StatCard>
 
             <StatCard variants={cardVariants}>
-              <StatIcon color={stats.winRate > 50 ? colors.trading.profit : colors.trading.loss}>
+              <StatIcon color={displayStats.winRate > 50 ? colors.trading.profit : colors.trading.loss}>
                 <Target />
               </StatIcon>
               <StatContent>
-                <StatValue $isPositive={stats.winRate > 50}>
-                  {formatPercentage(stats.winRate)}%
+                <StatValue $isPositive={displayStats.winRate > 50}>
+                  {formatPercentage(displayStats.winRate)}%
                 </StatValue>
                 <StatLabel>Win Rate</StatLabel>
               </StatContent>
             </StatCard>
 
             <StatCard variants={cardVariants}>
-              <StatIcon color={calculateAverageReturn(stats) > 0 ? colors.trading.profit : colors.trading.loss}>
+              <StatIcon color={calculateAverageReturn(displayStats) > 0 ? colors.trading.profit : colors.trading.loss}>
                 <Activity />
               </StatIcon>
               <StatContent>
                 <StatValue 
-                  $isPositive={calculateAverageReturn(stats) > 0}
-                  $isNegative={calculateAverageReturn(stats) < 0}
+                  $isPositive={calculateAverageReturn(displayStats) > 0}
+                  $isNegative={calculateAverageReturn(displayStats) < 0}
                 >
-                  {formatPercentage(calculateAverageReturn(stats))}%
+                  {formatPercentage(calculateAverageReturn(displayStats))}%
                 </StatValue>
                 <StatLabel>Rendimiento Promedio Por Trade</StatLabel>
               </StatContent>
@@ -659,8 +723,8 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
                 <TrendingUp />
               </StatIcon>
               <StatContent>
-                <StatValue $isPositive={stats.averageWin > 0}>
-                  {formatPercentage(stats.averageWin)}%
+                <StatValue $isPositive={displayStats.averageWin > 0}>
+                  {formatPercentage(displayStats.averageWin)}%
                 </StatValue>
                 <StatLabel>Promedio Ganancia Ganadores</StatLabel>
               </StatContent>
@@ -672,7 +736,7 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
               </StatIcon>
               <StatContent>
                 <StatValue $isNegative={true}>
-                  {formatPercentage(Math.abs(stats.averageLoss))}%
+                  {formatPercentage(Math.abs(displayStats.averageLoss))}%
                 </StatValue>
                 <StatLabel>Promedio Pérdida Perdedores</StatLabel>
               </StatContent>
@@ -765,8 +829,14 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
       ) : (
         <EmptyState>
           <EmptyIcon>📊</EmptyIcon>
-          <EmptyTitle>Sin datos disponibles</EmptyTitle>
-          <EmptyText>Agrega tu primer trade para ver las estadísticas</EmptyText>
+          <EmptyTitle>
+            {activeTab === 'swing' ? 'Sin datos de Swing Trading' : 'Sin datos de Day Trading'}
+          </EmptyTitle>
+          <EmptyText>
+            {activeTab === 'swing'
+              ? 'Agrega trades marcados como Swing Trading para ver las estadísticas'
+              : 'Agrega trades marcados como Day Trading para ver las estadísticas'}
+          </EmptyText>
         </EmptyState>
       )}
     </StatsContainer>

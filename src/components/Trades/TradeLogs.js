@@ -199,7 +199,8 @@ const TradeLogs = () => {
         >
           {activeTab === 'stats' ? (
             <TradeStats 
-              stats={stats} 
+              stats={stats}
+              trades={trades}
               openTrades={openTrades}
               loading={loading}
               error={error}
