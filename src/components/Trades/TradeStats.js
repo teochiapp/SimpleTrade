@@ -497,44 +497,44 @@ const TradeStats = ({ stats: _globalStats, trades = [], openTrades: _openTrades 
   // Logs para depuración (solo en desarrollo)
   useEffect(() => {
     console.log('🔍 DEBUG - TradeStats recibido:', {
-      stats: stats,
-      openTrades: openTrades,
-      openTradesLength: openTrades?.length || 0,
-      isArray: Array.isArray(openTrades),
+      activeTab: activeTab,
+      displayStats: displayStats,
+      filteredTrades: filteredTrades?.length || 0,
+      filteredOpenTrades: filteredOpenTrades?.length || 0,
       loading: loading,
       error: error
     });
     
-    if (openTrades && openTrades.length > 0) {
+    if (filteredOpenTrades && filteredOpenTrades.length > 0) {
       console.log('📊 CÁLCULO DE MÉTRICAS DE DIVERSIFICACIÓN:');
       
       // Debug para Company Diversification
-      const totalValue = openTrades.reduce((sum, trade) => {
+      const totalValue = filteredOpenTrades.reduce((sum, trade) => {
         const percentage = getTradeAttr(trade, 'portfolio_percentage') || 0;
         return sum + percentage;
       }, 0);
       
       console.log('🏢 Diversificación por Empresa:', {
-        totalOpenTrades: openTrades.length,
+        totalOpenTrades: filteredOpenTrades.length,
         totalPortfolioValue: totalValue,
         needsMoreThan20: totalValue >= 20,
         companyDivResult: companyDiv
       });
       
       console.log('🌍 Diversificación Geográfica:', {
-        totalOpenTrades: openTrades.length,
-        needsMoreThan2: openTrades.length > 2,
+        totalOpenTrades: filteredOpenTrades.length,
+        needsMoreThan2: filteredOpenTrades.length > 2,
         geoDivResult: geoDiv
       });
       
       console.log('📚 Diversificación por Sector:', {
-        totalOpenTrades: openTrades.length,
-        needsMoreThan3: openTrades.length > 3,
+        totalOpenTrades: filteredOpenTrades.length,
+        needsMoreThan3: filteredOpenTrades.length > 3,
         sectorDivResult: sectorDiv
       });
       
       // Log detallado de cada trade
-      openTrades.forEach((trade, index) => {
+      filteredOpenTrades.forEach((trade, index) => {
         const symbol = getTradeAttr(trade, 'symbol');
         const percentage = getTradeAttr(trade, 'portfolio_percentage');
         const symbolData = getSymbolData(symbol);
@@ -557,9 +557,9 @@ const TradeStats = ({ stats: _globalStats, trades = [], openTrades: _openTrades 
       });
       
     } else {
-      console.log('⚠️ NO HAY openTrades - Métricas de diversificación no disponibles');
+      console.log('⚠️ NO HAY trades filtrados - Métricas de diversificación no disponibles');
     }
-  }, [openTrades, companyDiv, geoDiv, sectorDiv, stats, loading, error]);
+  }, [activeTab, filteredTrades, filteredOpenTrades, companyDiv, geoDiv, sectorDiv, displayStats, loading, error]);
 
   if (loading) {
     return (
