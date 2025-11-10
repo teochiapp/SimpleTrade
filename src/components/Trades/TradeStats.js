@@ -270,8 +270,18 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
   const calculateCompanyDiversification = (openTrades) => {
     if (!openTrades || openTrades.length === 0) return { show: false };
     
-    // Calcular valor total de posiciones abiertas
-    const totalValue = openTrades.reduce((sum, trade) => {
+    // Filtrar trades que NO sean ETFs o índices (excluir sector 'ETF')
+    const nonEtfTrades = openTrades.filter(trade => {
+      const symbol = getTradeAttr(trade, 'symbol');
+      const symbolData = getSymbolData(symbol);
+      return symbolData.sector !== 'ETF';
+    });
+    
+    // Si no hay trades que no sean ETFs, no mostrar la métrica
+    if (nonEtfTrades.length === 0) return { show: false };
+    
+    // Calcular valor total de posiciones abiertas (solo no-ETFs)
+    const totalValue = nonEtfTrades.reduce((sum, trade) => {
       const percentage = getTradeAttr(trade, 'portfolio_percentage') || 0;
       return sum + percentage;
     }, 0);
@@ -279,9 +289,9 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
     // Solo evaluar si liquidez < 50% (es decir, posiciones > 50%) - REDUCIDO PARA TESTING
     if (totalValue < 20) return { show: false };
     
-    // Agrupar por empresa (símbolo)
+    // Agrupar por empresa (símbolo) - solo no-ETFs
     const companiesMap = new Map();
-    openTrades.forEach(trade => {
+    nonEtfTrades.forEach(trade => {
       const symbol = getTradeAttr(trade, 'symbol');
       const percentage = getTradeAttr(trade, 'portfolio_percentage') || 0;
       

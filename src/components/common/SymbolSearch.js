@@ -68,6 +68,35 @@ const EmptyState = styled.div`
   font-size: 0.9rem;
 `;
 
+const CustomSymbolOption = styled(motion.div)`
+  padding: 1rem;
+  cursor: pointer;
+  background: #e3f2fd;
+  border: 2px dashed #3498db;
+  margin: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #bbdefb;
+    border-color: #2980b9;
+  }
+`;
+
+const CustomSymbolText = styled.div`
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+`;
+
+const CustomSymbolHint = styled.div`
+  font-family: 'Unbounded', sans-serif;
+  font-size: 0.75rem;
+  color: #7f8c8d;
+`;
+
 const PopularSection = styled.div`
   padding: 0.5rem 0;
   border-bottom: 1px solid #f1f3f4;
@@ -356,6 +385,24 @@ const SymbolSearch = ({ onSymbolSelect, placeholder = "Buscar instrumento...", i
     onSymbolSelect(symbolWithPrice);
   };
 
+  const handleCustomSymbolCreate = () => {
+    const customSymbol = {
+      symbol: query.toUpperCase(),
+      name: query.toUpperCase(),
+      type: 'Custom',
+      region: 'Unknown',
+      currency: 'USD',
+      sector: 'Personalizado',
+      price: null,
+      isCustom: true
+    };
+    
+    setQuery(customSymbol.symbol);
+    setIsOpen(false);
+    setSelectedIndex(-1);
+    onSymbolSelect(customSymbol);
+  };
+
   const renderResults = () => {
     if (loading) {
       return (
@@ -365,12 +412,29 @@ const SymbolSearch = ({ onSymbolSelect, placeholder = "Buscar instrumento...", i
       );
     }
 
+    if (results.length === 0 && query.trim()) {
+      return (
+        <>
+          <EmptyState>
+            😞 No se encontraron instrumentos
+          </EmptyState>
+          <CustomSymbolOption
+            onClick={handleCustomSymbolCreate}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <CustomSymbolText>✨ Crear símbolo personalizado: {query.toUpperCase()}</CustomSymbolText>
+            <CustomSymbolHint>Podrás ingresar el precio manualmente</CustomSymbolHint>
+          </CustomSymbolOption>
+        </>
+      );
+    }
+
     if (results.length === 0) {
       return (
         <EmptyState>
-          😞 No se encontraron instrumentos
-          <br />
-          <small>Intenta con otro término de búsqueda</small>
+          💡 Escribe para buscar o crear un símbolo personalizado
         </EmptyState>
       );
     }
