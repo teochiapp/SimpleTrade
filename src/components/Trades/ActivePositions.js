@@ -430,12 +430,14 @@ const ActivePositions = ({ openTrades, loading, error, onCloseTrade }) => {
     setSelectedTrade(null);
   };
 
-  const handleTradeClosed = async (tradeId, exitPrice, result) => {
+  const handleTradeClosed = async (tradeId, exitPrice, result, notes) => {
     try {
-      await onCloseTrade(tradeId, exitPrice, result);
+      await onCloseTrade(tradeId, exitPrice, result, notes);
       handleCloseModal();
     } catch (err) {
       console.error('Error closing trade:', err);
+      // Propagar el error para que el modal lo pueda mostrar
+      throw err;
     }
   };
 

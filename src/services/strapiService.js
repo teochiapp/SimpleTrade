@@ -214,14 +214,10 @@ class StrapiService {
     try {
       console.log(`🔄 Updating trade ${tradeId}...`);
       
-      // Verificar autenticación ANTES de intentar actualizar
-      const isAuthenticated = await this.checkAuth();
-      if (!isAuthenticated) {
-        console.error('❌ No hay sesión válida');
-        alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
-        this.clearToken();
-        window.location.reload();
-        throw new Error('Session expired - please login again');
+      // Verificar que tenemos token
+      if (!this.token) {
+        console.error('❌ No hay token disponible');
+        throw new Error('No estás autenticado. Por favor, inicia sesión.');
       }
       
       console.log(`🔐 Token present:`, !!this.token);
@@ -243,9 +239,7 @@ class StrapiService {
         if (response.status === 401) {
           console.log('🔓 Token expired or invalid');
           this.clearToken();
-          alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
-          setTimeout(() => window.location.reload(), 500);
-          throw new Error('Token expired - please login again');
+          throw new Error('Tu sesión ha expirado. Por favor, recarga la página e inicia sesión nuevamente.');
         }
         
         throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
@@ -283,18 +277,6 @@ class StrapiService {
     try {
       console.log(`🔒 Iniciando cierre de trade ${tradeId}...`);
       
-      // Verificar autenticación antes de cerrar
-      const isAuthenticated = await this.checkAuth();
-      if (!isAuthenticated) {
-        console.error('❌ Sesión no válida al cerrar trade');
-        this.clearToken();
-        alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
-        setTimeout(() => window.location.reload(), 500);
-        throw new Error('Session expired - please login again');
-      }
-      
-      console.log('✅ Sesión válida, procediendo a cerrar trade...');
-      
       const tradeData = {
         exit_price: exitPrice,
         result: result, // resultado en porcentaje (ej: 10.5 = 10.5%)
@@ -303,23 +285,14 @@ class StrapiService {
         notes: notes || null // Agregar observaciones al cerrar
       };
 
+      // updateTrade ya verifica autenticación, no necesitamos hacerlo dos veces
       const updatedTrade = await this.updateTrade(tradeId, tradeData);
       console.log(`✅ Trade ${tradeId} cerrado exitosamente`);
       return updatedTrade;
     } catch (error) {
       console.error('Error closing trade:', error);
-      
-      // Si es un error de autenticación, manejar específicamente
-      if (error.message.includes('Session') || error.message.includes('Token') || error.message.includes('expired')) {
-        console.log('🔓 Error de autenticación detectado en closeTrade');
-        this.clearToken();
-        // No mostrar alerta adicional si ya se mostró una
-        if (!error.message.includes('please login again')) {
-          alert('Tu sesión ha expirado. La página se recargará.');
-          setTimeout(() => window.location.reload(), 500);
-        }
-      }
-      
+      // Propagar el error sin manejar autenticación aquí
+      // updateTrade ya se encargó de eso
       throw error;
     }
   }

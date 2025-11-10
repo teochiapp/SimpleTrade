@@ -212,9 +212,13 @@ const CloseTradeModal = ({ isOpen, onClose, trade, onTradeClosed }) => {
     try {
       const result = calculateResult();
       await onTradeClosed(trade.id, parseFloat(exitPrice), parseFloat(result), notes.trim());
+      // Solo cerrar el modal si no hubo errores
       onClose();
     } catch (err) {
-      setError(err.message);
+      console.error('Error al cerrar trade:', err);
+      // Mostrar mensaje de error al usuario
+      setError(err.message || 'Error al cerrar el trade. Por favor, intenta nuevamente.');
+      // No cerrar el modal para que el usuario pueda ver el error
     } finally {
       setLoading(false);
     }
