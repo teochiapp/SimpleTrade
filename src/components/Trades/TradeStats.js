@@ -40,6 +40,41 @@ const StatsContainer = styled.div`
   }
 `;
 
+const TabsContainer = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  padding: 2rem 2rem 0 2rem;
+  border-bottom: 2px solid ${colors.gray[200]};
+`;
+
+const Tab = styled.button`
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: ${props => props.$active ? colors.primary : 'transparent'};
+  color: ${props => props.$active ? colors.white : colors.gray[600]};
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: 'Unbounded', sans-serif;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  
+  &:hover {
+    background: ${props => props.$active ? colors.primary : colors.gray[100]};
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: ${props => props.$active ? colors.primary : 'transparent'};
+  }
+`;
+
 const StatsTitle = styled.h2`
   font-size: 1.75rem;
   font-weight: 700;
@@ -193,6 +228,7 @@ const EmptyText = styled.p`
 `;
 
 const TradeStats = ({ stats, openTrades, loading, error }) => {
+  const [activeTab, setActiveTab] = useState('swing'); // 'swing' o 'day'
   const [spyData, setSpyData] = useState({
     ytdPerformance: null,
     loading: true,
@@ -263,6 +299,32 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
   const getTradeAttr = (trade, attr) => {
     return trade.attributes ? trade.attributes[attr] : trade[attr];
   };
+
+  // Filtrar trades por estrategia
+  const filterTradesByStrategy = (trades, strategy) => {
+    if (!trades) return [];
+    return trades.filter(trade => {
+      const tradeStrategy = getTradeAttr(trade, 'strategy');
+      return tradeStrategy === strategy;
+    });
+  };
+
+  // Obtener trades filtrados según tab activa
+  const getFilteredTrades = () => {
+    if (activeTab === 'swing') {
+      return filterTradesByStrategy(openTrades, 'swing_trading');
+    } else {
+      return filterTradesByStrategy(openTrades, 'day_trading');
+    }
+  };
+
+  const filteredOpenTrades = getFilteredTrades();
+
+  // Calcular estadísticas filtradas por estrategia
+  // Nota: stats viene del hook y contiene TODOS los trades
+  // Aquí mostramos las stats globales pero filtramos solo las métricas de diversificación
+  // Si quisieras filtrar también las stats, necesitarías recalcularlas aquí
+  // Por ahora, las stats generales muestran todos los trades independientemente de la tab
 
   // MÉTRICAS DE DIVERSIFICACIÓN
 
@@ -362,10 +424,11 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
     };
   };
 
-  // Calcular métricas de diversificación
-  const companyDiv = calculateCompanyDiversification(openTrades);
-  const geoDiv = calculateGeographicDiversification(openTrades);
-  const sectorDiv = calculateSectorDiversification(openTrades);
+  // Calcular métricas de diversificación usando trades filtrados
+  // Para Day Trading, no mostrar métricas de diversificación
+  const companyDiv = activeTab === 'swing' ? calculateCompanyDiversification(filteredOpenTrades) : { show: false };
+  const geoDiv = activeTab === 'swing' ? calculateGeographicDiversification(filteredOpenTrades) : { show: false };
+  const sectorDiv = activeTab === 'swing' ? calculateSectorDiversification(filteredOpenTrades) : { show: false };
 
   // Logs para depuración (solo en desarrollo)
   useEffect(() => {
@@ -501,6 +564,22 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
         </StatsTitle>
       </motion.div>
 
+      {/* Tabs para Swing Trading y Day Trading */}
+      <TabsContainer>
+        <Tab 
+          $active={activeTab === 'swing'}
+          onClick={() => setActiveTab('swing')}
+        >
+          Swing Trading
+        </Tab>
+        <Tab 
+          $active={activeTab === 'day'}
+          onClick={() => setActiveTab('day')}
+        >
+          Day Trading
+        </Tab>
+      </TabsContainer>
+
       {stats && stats.totalTrades > 0 ? (
         <motion.div
           variants={containerVariants}
@@ -599,39 +678,41 @@ const TradeStats = ({ stats, openTrades, loading, error }) => {
               </StatContent>
             </StatCard>
 
-            {/* SPY YTD Performance Card */}
-            <StatCard variants={cardVariants}>
-              <StatIcon color={
-                spyData.loading ? colors.gray[400] :
-                spyData.error || spyData.ytdPerformance === null ? colors.gray[400] :
-                spyData.ytdPerformance > 0 ? colors.trading.profit : colors.trading.loss
-              }>
-                <LineChart />
-              </StatIcon>
-              <StatContent>
-                {spyData.loading ? (
-                  <>
-                    <StatValue>...</StatValue>
-                    <StatLabel>Cargando SPY YTD</StatLabel>
-                  </>
-                ) : spyData.error || spyData.ytdPerformance === null ? (
-                  <>
-                    <StatValue style={{ fontSize: '0.9rem', color: colors.gray[500] }}>No disponible</StatValue>
-                    <StatLabel>SPY Rendimiento YTD</StatLabel>
-                  </>
-                ) : (
-                  <>
-                    <StatValue 
-                      $isPositive={spyData.ytdPerformance > 0}
-                      $isNegative={spyData.ytdPerformance < 0}
-                    >
-                      {formatPercentage(spyData.ytdPerformance)}%
-                    </StatValue>
-                    <StatLabel>SPY Rendimiento YTD</StatLabel>
-                  </>
-                )}
-              </StatContent>
-            </StatCard>
+            {/* SPY YTD Performance Card - Solo en Swing Trading */}
+            {activeTab === 'swing' && (
+              <StatCard variants={cardVariants}>
+                <StatIcon color={
+                  spyData.loading ? colors.gray[400] :
+                  spyData.error || spyData.ytdPerformance === null ? colors.gray[400] :
+                  spyData.ytdPerformance > 0 ? colors.trading.profit : colors.trading.loss
+                }>
+                  <LineChart />
+                </StatIcon>
+                <StatContent>
+                  {spyData.loading ? (
+                    <>
+                      <StatValue>...</StatValue>
+                      <StatLabel>Cargando SPY YTD</StatLabel>
+                    </>
+                  ) : spyData.error || spyData.ytdPerformance === null ? (
+                    <>
+                      <StatValue style={{ fontSize: '0.9rem', color: colors.gray[500] }}>No disponible</StatValue>
+                      <StatLabel>SPY Rendimiento YTD</StatLabel>
+                    </>
+                  ) : (
+                    <>
+                      <StatValue 
+                        $isPositive={spyData.ytdPerformance > 0}
+                        $isNegative={spyData.ytdPerformance < 0}
+                      >
+                        {formatPercentage(spyData.ytdPerformance)}%
+                      </StatValue>
+                      <StatLabel>SPY Rendimiento YTD</StatLabel>
+                    </>
+                  )}
+                </StatContent>
+              </StatCard>
+            )}
 
             {/* MÉTRICAS DE DIVERSIFICACIÓN */}
             

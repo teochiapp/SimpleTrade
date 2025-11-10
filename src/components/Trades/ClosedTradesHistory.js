@@ -14,9 +14,11 @@ import {
   Shield, 
   Clock,
   BarChart3,
-  Eye
+  Eye,
+  Edit2
 } from 'lucide-react';
 import { getStrategyDisplayName } from './TradeForm';
+import EditTradeModal from './EditTradeModal';
 import { colors, componentColors, getTradingColor, withOpacity } from '../../styles/colors';
 
 const HistoryContainer = styled.div`
@@ -415,7 +417,7 @@ const ModalButton = styled.button`
   `}
 `;
 
-const ClosedTradesHistory = ({ closedTrades, loading, error, onDeleteTrade }) => {
+const ClosedTradesHistory = ({ closedTrades, loading, error, onDeleteTrade, onUpdateTrade }) => {
   const [filters, setFilters] = useState({
     symbol: '',
     type: '',
@@ -427,6 +429,7 @@ const ClosedTradesHistory = ({ closedTrades, loading, error, onDeleteTrade }) =>
   const [deleteConfirm, setDeleteConfirm] = useState({ show: false, trade: null });
   const [selectedTrade, setSelectedTrade] = useState(null);
   const [showTradeDetail, setShowTradeDetail] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   // Función para adaptar estructura de Strapi
   const getTradeAttr = (trade, attr) => {
@@ -539,6 +542,30 @@ const ClosedTradesHistory = ({ closedTrades, loading, error, onDeleteTrade }) =>
   const handleCloseDetail = () => {
     setShowTradeDetail(false);
     setSelectedTrade(null);
+  };
+
+  // Funciones para edición
+  const handleEditClick = (trade, e) => {
+    e.stopPropagation(); // Evitar que se abra el modal de detalles
+    setSelectedTrade(trade);
+    setShowEditModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setSelectedTrade(null);
+  };
+
+  const handleTradeUpdated = async (tradeId, updateData) => {
+    try {
+      if (onUpdateTrade) {
+        await onUpdateTrade(tradeId, updateData);
+      }
+      handleCloseEditModal();
+    } catch (err) {
+      console.error('Error updating trade:', err);
+      throw err;
+    }
   };
 
   // Función para calcular días que estuvo abierto el trade
@@ -674,6 +701,13 @@ const ClosedTradesHistory = ({ closedTrades, loading, error, onDeleteTrade }) =>
                   <TradeResult $positive={calculateTradeResult(trade) >= 0}>
                     {formatPercentage(calculateTradeResult(trade))}%
                   </TradeResult>
+                  <DeleteButton 
+                    onClick={(e) => handleEditClick(trade, e)}
+                    title="Editar trade"
+                    style={{ marginRight: '0.5rem', background: colors.primary }}
+                  >
+                    <Edit2 size={16} />
+                  </DeleteButton>
                   <DeleteButton 
                     onClick={(e) => {
                       e.stopPropagation(); // Evitar que se abra el modal
@@ -953,6 +987,16 @@ const ClosedTradesHistory = ({ closedTrades, loading, error, onDeleteTrade }) =>
           </TradeDetailModal>
         )}
       </AnimatePresence>
+
+      {/* Modal para editar trade */}
+      {showEditModal && (
+        <EditTradeModal
+          isOpen={showEditModal}
+          onClose={handleCloseEditModal}
+          trade={selectedTrade}
+          onTradeUpdated={handleTradeUpdated}
+        />
+      )}
     </HistoryContainer>
   );
 };

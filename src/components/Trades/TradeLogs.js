@@ -82,7 +82,7 @@ const TabContent = styled.div`
 const TradeLogs = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('stats');
-  const { trades, openTrades, closedTrades, stats, loading, error, createTrade, deleteTrade, closeTrade, refreshTrades } = useStrapiTrades();
+  const { trades, openTrades, closedTrades, stats, loading, error, createTrade, updateTrade, deleteTrade, closeTrade, refreshTrades } = useStrapiTrades();
 
   const handleTradeAdded = async (tradeData) => {
     try {
@@ -110,6 +110,15 @@ const TradeLogs = () => {
       await closeTrade(tradeId, exitPrice, result, notes);
     } catch (err) {
       console.error('Error closing trade:', err);
+    }
+  };
+
+  const handleUpdateTrade = async (tradeId, updateData) => {
+    try {
+      await updateTrade(tradeId, updateData);
+    } catch (err) {
+      console.error('Error updating trade:', err);
+      throw err;
     }
   };
 
@@ -201,6 +210,7 @@ const TradeLogs = () => {
               loading={loading}
               error={error}
               onCloseTrade={handleCloseTrade}
+              onUpdateTrade={handleUpdateTrade}
             />
           ) : activeTab === 'form' ? (
             <TradeForm onTradeAdded={handleTradeAdded} />
@@ -236,6 +246,7 @@ const TradeLogs = () => {
               loading={loading}
               error={error}
               onDeleteTrade={deleteTrade}
+              onUpdateTrade={handleUpdateTrade}
             />
           )}
         </motion.div>

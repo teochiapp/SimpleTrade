@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { AlertTriangle, TrendingUp, Hand, Target, Building2, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
+import { AlertTriangle, TrendingUp, Hand, Target, Building2, ArrowUpCircle, ArrowDownCircle, Edit2 } from 'lucide-react';
 import CloseTradeModal from './CloseTradeModal';
+import EditTradeModal from './EditTradeModal';
 import { useRealTimePrices } from '../../hooks/useRealTimePrices';
 import companyLogoService from '../../services/companyLogoService';
 import { getStrategyDisplayName } from './TradeForm';
@@ -317,9 +318,10 @@ const RecommendationLabel = styled.div`
   align-items: center;
 `;
 
-const ActivePositions = ({ openTrades, loading, error, onCloseTrade }) => {
+const ActivePositions = ({ openTrades, loading, error, onCloseTrade, onUpdateTrade }) => {
   const [selectedTrade, setSelectedTrade] = useState(null);
   const [showCloseModal, setShowCloseModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [companyLogos, setCompanyLogos] = useState(new Map());
   
   // Hook para precios en tiempo real
@@ -425,8 +427,18 @@ const ActivePositions = ({ openTrades, loading, error, onCloseTrade }) => {
     setShowCloseModal(true);
   };
 
+  const handleEditTrade = (trade) => {
+    setSelectedTrade(trade);
+    setShowEditModal(true);
+  };
+
   const handleCloseModal = () => {
     setShowCloseModal(false);
+    setSelectedTrade(null);
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
     setSelectedTrade(null);
   };
 
@@ -437,6 +449,16 @@ const ActivePositions = ({ openTrades, loading, error, onCloseTrade }) => {
     } catch (err) {
       console.error('Error closing trade:', err);
       // Propagar el error para que el modal lo pueda mostrar
+      throw err;
+    }
+  };
+
+  const handleTradeUpdated = async (tradeId, updateData) => {
+    try {
+      await onUpdateTrade(tradeId, updateData);
+      handleCloseEditModal();
+    } catch (err) {
+      console.error('Error updating trade:', err);
       throw err;
     }
   };
@@ -665,8 +687,20 @@ const ActivePositions = ({ openTrades, loading, error, onCloseTrade }) => {
                 </DaysOpen>
               </PositionFooter>
 
-              {/* Botón Cerrar centrado al final */}
+              {/* Botones de acción */}
               <CloseButtonContainer>
+                <CloseButton 
+                  onClick={() => handleEditTrade(trade)}
+                  style={{ 
+                    background: 'transparent', 
+                    color: colors.primary, 
+                    border: `2px solid ${colors.primary}`,
+                    marginRight: '0.5rem'
+                  }}
+                >
+                  <Edit2 size={16} style={{ marginRight: '0.25rem' }} />
+                  Editar
+                </CloseButton>
                 <CloseButton onClick={() => handleCloseTrade(trade)}>
                   Cerrar Posición
                 </CloseButton>
@@ -676,12 +710,23 @@ const ActivePositions = ({ openTrades, loading, error, onCloseTrade }) => {
         </PositionsGrid>
       </PositionsContainer>
 
-      {showCloseModal && selectedTrade && (
+      {/* Modal para cerrar trade */}
+      {showCloseModal && (
         <CloseTradeModal
           isOpen={showCloseModal}
           onClose={handleCloseModal}
           trade={selectedTrade}
           onTradeClosed={handleTradeClosed}
+        />
+      )}
+
+      {/* Modal para editar trade */}
+      {showEditModal && (
+        <EditTradeModal
+          isOpen={showEditModal}
+          onClose={handleCloseEditModal}
+          trade={selectedTrade}
+          onTradeUpdated={handleTradeUpdated}
         />
       )}
     </>

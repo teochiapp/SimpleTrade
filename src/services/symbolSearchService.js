@@ -201,10 +201,15 @@ class SymbolSearchService {
       { symbol: 'VALE', name: 'Vale S.A.', sector: 'Minería', region: 'BR', currency: 'BRL', type: 'Equity' },
       { symbol: 'PETR4', name: 'Petróleo Brasileiro S.A.', sector: 'Energía', region: 'BR', currency: 'BRL', type: 'Equity' },
       { symbol: 'PBR', name: 'Petrobras ADR', sector: 'Energía', region: 'BR', currency: 'USD', type: 'Equity' },
+      { symbol: 'JD', name: 'JD.com Inc.', sector: 'E-commerce', region: 'CN', currency: 'USD', type: 'Equity' },
+      { symbol: 'BABA', name: 'Alibaba Group Holding Ltd.', sector: 'E-commerce', region: 'CN', currency: 'USD', type: 'Equity' },
+      { symbol: 'NTES', name: 'NetEase Inc.', sector: 'Tecnología', region: 'CN', currency: 'USD', type: 'Equity' },
+      { symbol: 'NU', name: 'Nu Holdings Ltd. (Nubank)', sector: 'Financiero', region: 'BR', currency: 'USD', type: 'Equity' },
       
       // 🏦 Crypto
       { symbol: 'BTC', name: 'Bitcoin', sector: 'Criptomoneda', region: 'Global', currency: 'USD', type: 'Crypto' },
-      { symbol: 'ETH', name: 'Ethereum', sector: 'Criptomoneda', region: 'Global', currency: 'USD', type: 'Crypto' }
+      { symbol: 'ETH', name: 'Ethereum', sector: 'Criptomoneda', region: 'Global', currency: 'USD', type: 'Crypto' },
+      { symbol: 'XRP', name: 'Ripple (XRP)', sector: 'Criptomoneda', region: 'Global', currency: 'USD', type: 'Crypto' }
     ];
   }
 
@@ -278,6 +283,7 @@ class SymbolSearchService {
       { symbol: 'BBDC4', name: 'Banco Bradesco S.A.', sector: 'Financiero', region: 'BR', currency: 'BRL', type: 'Equity' },
       { symbol: 'ABEV', name: 'Ambev S.A.', sector: 'Consumo', region: 'BR', currency: 'BRL', type: 'Equity' },
       { symbol: 'PBR', name: 'Petrobras ADR', sector: 'Energía', region: 'BR', currency: 'USD', type: 'Equity' },
+      { symbol: 'NU', name: 'Nu Holdings Ltd. (Nubank)', sector: 'Financiero', region: 'BR', currency: 'USD', type: 'Equity' },
       
       // 🇨🇳 China
       { symbol: 'BABA', name: 'Alibaba Group Holding Ltd.', sector: 'E-commerce', region: 'CN', currency: 'USD', type: 'Equity' },
@@ -285,13 +291,15 @@ class SymbolSearchService {
       { symbol: 'TCEHY', name: 'Tencent Holdings Ltd.', sector: 'Tecnología', region: 'CN', currency: 'USD', type: 'Equity' },
       { symbol: 'NIO', name: 'NIO Inc.', sector: 'Automotriz', region: 'CN', currency: 'USD', type: 'Equity' },
       { symbol: 'BIDU', name: 'Baidu Inc.', sector: 'Tecnología', region: 'CN', currency: 'USD', type: 'Equity' },
+      { symbol: 'NTES', name: 'NetEase Inc.', sector: 'Tecnología', region: 'CN', currency: 'USD', type: 'Equity' },
       
       // 🏦 Criptomonedas
       { symbol: 'BTC', name: 'Bitcoin', sector: 'Criptomoneda', region: 'Global', currency: 'USD', type: 'Crypto' },
       { symbol: 'ETH', name: 'Ethereum', sector: 'Criptomoneda', region: 'Global', currency: 'USD', type: 'Crypto' },
       { symbol: 'ADA', name: 'Cardano', sector: 'Criptomoneda', region: 'Global', currency: 'USD', type: 'Crypto' },
       { symbol: 'SOL', name: 'Solana', sector: 'Criptomoneda', region: 'Global', currency: 'USD', type: 'Crypto' },
-      { symbol: 'MATIC', name: 'Polygon', sector: 'Criptomoneda', region: 'Global', currency: 'USD', type: 'Crypto' }
+      { symbol: 'MATIC', name: 'Polygon', sector: 'Criptomoneda', region: 'Global', currency: 'USD', type: 'Crypto' },
+      { symbol: 'XRP', name: 'Ripple (XRP)', sector: 'Criptomoneda', region: 'Global', currency: 'USD', type: 'Crypto' }
     ];
   }
 
