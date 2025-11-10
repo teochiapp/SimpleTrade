@@ -165,6 +165,7 @@ class SymbolSearchService {
       { symbol: 'QQQ', name: 'Invesco QQQ Trust (Nasdaq-100)', sector: 'ETF', region: 'US', currency: 'USD', type: 'ETF' },
       { symbol: 'DIA', name: 'SPDR Dow Jones Industrial Average ETF', sector: 'ETF', region: 'US', currency: 'USD', type: 'ETF' },
       { symbol: 'TQQQ', name: 'ProShares UltraPro QQQ (3x)', sector: 'ETF', region: 'US', currency: 'USD', type: 'ETF' },
+      { symbol: 'PSQ', name: 'ProShares Short QQQ (Inverse ETF)', sector: 'ETF', region: 'US', currency: 'USD', type: 'ETF' },
       
       // 🇺🇸 Tecnología
       { symbol: 'AAPL', name: 'Apple Inc.', sector: 'Tecnología', region: 'US', currency: 'USD', type: 'Equity' },
@@ -218,6 +219,7 @@ class SymbolSearchService {
       { symbol: 'VTI', name: 'Vanguard Total Stock Market ETF', sector: 'ETF', region: 'US', currency: 'USD', type: 'ETF' },
       { symbol: 'VOO', name: 'Vanguard S&P 500 ETF', sector: 'ETF', region: 'US', currency: 'USD', type: 'ETF' },
       { symbol: 'TQQQ', name: 'ProShares UltraPro QQQ (3x)', sector: 'ETF', region: 'US', currency: 'USD', type: 'ETF' },
+      { symbol: 'PSQ', name: 'ProShares Short QQQ (Inverse ETF)', sector: 'ETF', region: 'US', currency: 'USD', type: 'ETF' },
       
       // 🇺🇸 Estados Unidos - Tecnología
       { symbol: 'AAPL', name: 'Apple Inc.', sector: 'Tecnología', region: 'US', currency: 'USD', type: 'Equity' },

@@ -41,6 +41,7 @@ export const symbolMapping = {
   'VTI': { country: 'USA', sector: 'ETF', company: 'Vanguard Total Stock Market ETF' },
   'VOO': { country: 'USA', sector: 'ETF', company: 'Vanguard S&P 500 ETF' },
   'TQQQ': { country: 'USA', sector: 'ETF', company: 'ProShares UltraPro QQQ' },
+  'PSQ': { country: 'USA', sector: 'ETF', company: 'ProShares Short QQQ' },
   
   // 🇺🇸 Estados Unidos - Tecnología
   'AAPL': { country: 'USA', sector: 'TECHNOLOGY', company: 'Apple Inc.' },

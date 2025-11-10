@@ -167,13 +167,11 @@ const Diversification = ({ openTrades, loading, error }) => {
       const symbolData = getSymbolData(symbol);
       totalPortfolio += portfolioPercentage;
 
-      // Por empresa - EXCLUIR ETFs (ya que contienen múltiples empresas)
-      if (symbolData.sector !== 'ETF') {
-        if (companies[symbol]) {
-          companies[symbol] += portfolioPercentage;
-        } else {
-          companies[symbol] = portfolioPercentage;
-        }
+      // Por empresa (incluyendo ETFs para visualización completa de la cartera)
+      if (companies[symbol]) {
+        companies[symbol] += portfolioPercentage;
+      } else {
+        companies[symbol] = portfolioPercentage;
       }
 
       // Por país

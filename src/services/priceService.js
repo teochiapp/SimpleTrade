@@ -173,6 +173,7 @@ class PriceService {
       'VTI': 240,
       'VOO': 420,
       'TQQQ': 120,
+      'PSQ': 12,
       // US Stocks
       'AAPL': 150,
       'GOOGL': 130,
