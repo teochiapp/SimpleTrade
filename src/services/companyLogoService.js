@@ -8,6 +8,15 @@ class CompanyLogoService {
     
     // Mapeo manual para símbolos conocidos (puedes expandir esta lista)
     this.knownLogos = {
+      // ETFs principales
+      'SPY': 'https://logo.clearbit.com/ssga.com',
+      'QQQ': 'https://logo.clearbit.com/invesco.com',
+      'DIA': 'https://logo.clearbit.com/ssga.com',
+      'IWM': 'https://logo.clearbit.com/ishares.com',
+      'VTI': 'https://logo.clearbit.com/vanguard.com',
+      'VOO': 'https://logo.clearbit.com/vanguard.com',
+      
+      // Empresas US
       'AAPL': 'https://logo.clearbit.com/apple.com',
       'GOOGL': 'https://logo.clearbit.com/google.com',
       'GOOGLE': 'https://logo.clearbit.com/google.com',
@@ -41,11 +50,10 @@ class CompanyLogoService {
       'SNAP': 'https://logo.clearbit.com/snap.com',
       'SQ': 'https://logo.clearbit.com/squareup.com',
       'SHOP': 'https://logo.clearbit.com/shopify.com',
-      'CRM': 'https://logo.clearbit.com/salesforce.com',
       'ROKU': 'https://logo.clearbit.com/roku.com',
       'PINS': 'https://logo.clearbit.com/pinterest.com',
       
-      // Empresas argentinas
+      // Empresas argentinas (NYSE ADRs)
       'YPFD': 'https://logo.clearbit.com/ypf.com',
       'YPF': 'https://logo.clearbit.com/ypf.com',
       'GGAL': 'https://logo.clearbit.com/grupogalicia.com',
@@ -53,9 +61,22 @@ class CompanyLogoService {
       'TEO': 'https://logo.clearbit.com/telecom.com.ar',
       'TX': 'https://logo.clearbit.com/ternium.com',
       'PAM': 'https://logo.clearbit.com/pampaenergia.com',
+      'PAMP': 'https://logo.clearbit.com/pampaenergia.com',
       'SUPV': 'https://logo.clearbit.com/supervielle.com.ar',
       'COME': 'https://logo.clearbit.com/bancor.com.ar',
       'CEPU': 'https://logo.clearbit.com/cepsa.com',
+      
+      // Empresas argentinas (BYMA)
+      'GGAL.BA': 'https://logo.clearbit.com/grupogalicia.com',
+      'YPF.BA': 'https://logo.clearbit.com/ypf.com',
+      'PAMP.BA': 'https://logo.clearbit.com/pampaenergia.com',
+      'ALUA.BA': 'https://logo.clearbit.com/aluar.com.ar',
+      'TRAN.BA': 'https://logo.clearbit.com/transener.com.ar',
+      'COME.BA': 'https://logo.clearbit.com/soccomdelplata.com.ar',
+      'EDN.BA': 'https://logo.clearbit.com/edenor.com.ar',
+      'TXAR.BA': 'https://logo.clearbit.com/ternium.com',
+      'MIRG.BA': 'https://logo.clearbit.com/mirgor.com.ar',
+      'LOMA.BA': 'https://logo.clearbit.com/lomanegra.com',
       
       // Empresas brasileñas
       'VALE': 'https://logo.clearbit.com/vale.com',

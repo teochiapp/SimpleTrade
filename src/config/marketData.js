@@ -27,11 +27,21 @@ export const SECTORS = {
   REAL_ESTATE: 'Bienes Raíces',
   TELECOMMUNICATIONS: 'Telecomunicaciones',
   CRYPTO: 'Criptomonedas',
+  ETF: 'ETF',
   OTHER: 'Otro'
 };
 
 // Mapeo de símbolos a países y sectores
 export const symbolMapping = {
+  // 📊 ETFs
+  'SPY': { country: 'USA', sector: 'ETF', company: 'SPDR S&P 500 ETF Trust' },
+  'QQQ': { country: 'USA', sector: 'ETF', company: 'Invesco QQQ Trust' },
+  'DIA': { country: 'USA', sector: 'ETF', company: 'SPDR Dow Jones Industrial Average ETF' },
+  'IWM': { country: 'USA', sector: 'ETF', company: 'iShares Russell 2000 ETF' },
+  'VTI': { country: 'USA', sector: 'ETF', company: 'Vanguard Total Stock Market ETF' },
+  'VOO': { country: 'USA', sector: 'ETF', company: 'Vanguard S&P 500 ETF' },
+  'TQQQ': { country: 'USA', sector: 'ETF', company: 'ProShares UltraPro QQQ' },
+  
   // 🇺🇸 Estados Unidos - Tecnología
   'AAPL': { country: 'USA', sector: 'TECHNOLOGY', company: 'Apple Inc.' },
   'GOOGL': { country: 'USA', sector: 'TECHNOLOGY', company: 'Alphabet Inc.' },
@@ -64,13 +74,57 @@ export const symbolMapping = {
   'BA': { country: 'USA', sector: 'INDUSTRIAL', company: 'Boeing Co.' },
   'CAT': { country: 'USA', sector: 'INDUSTRIAL', company: 'Caterpillar Inc.' },
   
-  // 🇦🇷 Argentina
+  // 🇦🇷 Argentina (NYSE - ADRs)
   'YPFD': { country: 'ARG', sector: 'ENERGY', company: 'YPF S.A.' },
   'TECO2': { country: 'ARG', sector: 'TELECOMMUNICATIONS', company: 'Telecom Argentina' },
   'PAMP': { country: 'ARG', sector: 'ENERGY', company: 'Pampa Energía' },
   'BMA': { country: 'ARG', sector: 'FINANCIAL', company: 'Banco Macro' },
   'SUPV': { country: 'ARG', sector: 'FINANCIAL', company: 'Grupo Supervielle' },
   'CEPU': { country: 'ARG', sector: 'UTILITIES', company: 'Central Puerto' },
+  
+  // 🇦🇷 Argentina (BYMA - Bolsa de Buenos Aires)
+  'AGRO.BA': { country: 'ARG', sector: 'CONSUMER_STAPLES', company: 'Adecoagro S.A.' },
+  'ALUA.BA': { country: 'ARG', sector: 'INDUSTRIAL', company: 'Aluar Aluminio Argentino S.A.I.C.' },
+  'AUSO.BA': { country: 'ARG', sector: 'INDUSTRIAL', company: 'Autopistas del Sol S.A.' },
+  'BBAR.BA': { country: 'ARG', sector: 'FINANCIAL', company: 'BBVA Argentina S.A.' },
+  'BHIP.BA': { country: 'ARG', sector: 'FINANCIAL', company: 'Banco Hipotecario S.A.' },
+  'BMA.BA': { country: 'ARG', sector: 'FINANCIAL', company: 'Banco Macro S.A.' },
+  'BYMA.BA': { country: 'ARG', sector: 'FINANCIAL', company: 'Bolsas y Mercados Argentinos S.A.' },
+  'CECO2.BA': { country: 'ARG', sector: 'UTILITIES', company: 'Central Costanera S.A.' },
+  'CEPU.BA': { country: 'ARG', sector: 'UTILITIES', company: 'Central Puerto S.A.' },
+  'COME.BA': { country: 'ARG', sector: 'INDUSTRIAL', company: 'Sociedad Comercial del Plata S.A.' },
+  'CRES.BA': { country: 'ARG', sector: 'REAL_ESTATE', company: 'Cresud S.A.C.I.F.yA.' },
+  'CVH.BA': { country: 'ARG', sector: 'TELECOMMUNICATIONS', company: 'Cablevisión Holding S.A.' },
+  'DGCU2.BA': { country: 'ARG', sector: 'UTILITIES', company: 'Distribuidora de Gas Cuyana S.A.' },
+  'EDN.BA': { country: 'ARG', sector: 'UTILITIES', company: 'Edenor S.A.' },
+  'GCLA.BA': { country: 'ARG', sector: 'TELECOMMUNICATIONS', company: 'Grupo Clarín S.A.' },
+  'GGAL.BA': { country: 'ARG', sector: 'FINANCIAL', company: 'Grupo Financiero Galicia S.A.' },
+  'HAVA.BA': { country: 'ARG', sector: 'CONSUMER_DISCRETIONARY', company: 'Havanna Holding S.A.' },
+  'IMV.BA': { country: 'ARG', sector: 'INDEX', company: 'S&P MERVAL Argentina Index' },
+  'IRCP.BA': { country: 'ARG', sector: 'REAL_ESTATE', company: 'IRSA Propiedades Comerciales S.A.' },
+  'IRSA.BA': { country: 'ARG', sector: 'REAL_ESTATE', company: 'IRSA Inversiones y Representaciones S.A.' },
+  'LEDE.BA': { country: 'ARG', sector: 'CONSUMER_STAPLES', company: 'Ledesma S.A.A.I.' },
+  'LOMA.BA': { country: 'ARG', sector: 'MATERIALS', company: 'Loma Negra C.I.A.S.A.' },
+  'LONG.BA': { country: 'ARG', sector: 'INDUSTRIAL', company: 'Longvie S.A.' },
+  'MERVAL.BA': { country: 'ARG', sector: 'INDEX', company: 'MERVAL Index' },
+  'METR.BA': { country: 'ARG', sector: 'UTILITIES', company: 'Metrogas S.A.' },
+  'MERV.BA': { country: 'ARG', sector: 'INDEX', company: 'S&P MERVAL Index' },
+  'MIRG.BA': { country: 'ARG', sector: 'TECHNOLOGY', company: 'Mirgor S.A.C.I.F.I.A.' },
+  'MOLA.BA': { country: 'ARG', sector: 'CONSUMER_STAPLES', company: 'Molinos Agro S.A.' },
+  'MOLI.BA': { country: 'ARG', sector: 'CONSUMER_STAPLES', company: 'Molinos Río de la Plata S.A.' },
+  'OEST.BA': { country: 'ARG', sector: 'INDUSTRIAL', company: 'Grupo Concesionario del Oeste S.A.' },
+  'PAMP.BA': { country: 'ARG', sector: 'ENERGY', company: 'Pampa Energía S.A.' },
+  'RICH.BA': { country: 'ARG', sector: 'HEALTHCARE', company: 'Laboratorios Richmond S.A.C.I.F.' },
+  'SAMI.BA': { country: 'ARG', sector: 'CONSUMER_STAPLES', company: 'San Miguel S.A.' },
+  'SPMERVAL.BA': { country: 'ARG', sector: 'INDEX', company: 'S&P MERVAL Total Return' },
+  'SUPV.BA': { country: 'ARG', sector: 'FINANCIAL', company: 'Grupo Supervielle S.A.' },
+  'TECO2.BA': { country: 'ARG', sector: 'TELECOMMUNICATIONS', company: 'Telecom Argentina S.A.' },
+  'TGNO4.BA': { country: 'ARG', sector: 'ENERGY', company: 'Transportadora de Gas del Norte S.A.' },
+  'TGSU2.BA': { country: 'ARG', sector: 'ENERGY', company: 'Transportadora de Gas del Sur S.A.' },
+  'TRAN.BA': { country: 'ARG', sector: 'UTILITIES', company: 'Transener S.A.' },
+  'TXAR.BA': { country: 'ARG', sector: 'INDUSTRIAL', company: 'Ternium Argentina' },
+  'VALO.BA': { country: 'ARG', sector: 'FINANCIAL', company: 'Grupo Financiero Valores S.A.' },
+  'YPF.BA': { country: 'ARG', sector: 'ENERGY', company: 'YPF S.A.' },
   
   // 🇧🇷 Brasil
   'VALE': { country: 'BRA', sector: 'MATERIALS', company: 'Vale S.A.' },

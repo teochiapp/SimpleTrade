@@ -134,9 +134,9 @@ class SymbolSearchService {
         return false;
       }
       
-      // Solo Common Stock y acciones de BYMA
-      const allowedTypes = ['Common Stock', 'EQS', 'Equity'];
-      if (!allowedTypes.includes(item.type) && !symbol.endsWith('.BA')) {
+      // Solo Common Stock, ETFs e índices
+      const allowedTypes = ['Common Stock', 'EQS', 'Equity', 'ETF', 'ETP', 'Index'];
+      if (!allowedTypes.includes(item.type)) {
         return false;
       }
       
@@ -160,6 +160,12 @@ class SymbolSearchService {
   // Símbolos populares por defecto
   getPopularSymbols() {
     return [
+      // 📊 ETFs
+      { symbol: 'SPY', name: 'SPDR S&P 500 ETF Trust', sector: 'ETF', region: 'US', currency: 'USD', type: 'ETF' },
+      { symbol: 'QQQ', name: 'Invesco QQQ Trust (Nasdaq-100)', sector: 'ETF', region: 'US', currency: 'USD', type: 'ETF' },
+      { symbol: 'DIA', name: 'SPDR Dow Jones Industrial Average ETF', sector: 'ETF', region: 'US', currency: 'USD', type: 'ETF' },
+      { symbol: 'TQQQ', name: 'ProShares UltraPro QQQ (3x)', sector: 'ETF', region: 'US', currency: 'USD', type: 'ETF' },
+      
       // 🇺🇸 Tecnología
       { symbol: 'AAPL', name: 'Apple Inc.', sector: 'Tecnología', region: 'US', currency: 'USD', type: 'Equity' },
       { symbol: 'GOOGL', name: 'Alphabet Inc. (Google)', sector: 'Tecnología', region: 'US', currency: 'USD', type: 'Equity' },
@@ -174,14 +180,26 @@ class SymbolSearchService {
       { symbol: 'JPM', name: 'JPMorgan Chase & Co.', sector: 'Financiero', region: 'US', currency: 'USD', type: 'Equity' },
       { symbol: 'BAC', name: 'Bank of America Corp.', sector: 'Financiero', region: 'US', currency: 'USD', type: 'Equity' },
       
-      // 🇦🇷 Argentina
-      { symbol: 'YPFD', name: 'YPF S.A.', sector: 'Energía', region: 'AR', currency: 'ARS', type: 'Equity' },
-      { symbol: 'PAMP', name: 'Pampa Energía S.A.', sector: 'Energía', region: 'AR', currency: 'ARS', type: 'Equity' },
-      { symbol: 'BMA', name: 'Banco Macro S.A.', sector: 'Financiero', region: 'AR', currency: 'ARS', type: 'Equity' },
+      // 🇦🇷 ADRs en NYSE
+      { symbol: 'YPF', name: 'YPF S.A.', sector: 'Energía', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'PAM', name: 'Pampa Energía S.A.', sector: 'Energía', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'BMA', name: 'Banco Macro S.A.', sector: 'Financiero', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'GGAL', name: 'Grupo Financiero Galicia S.A.', sector: 'Financiero', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'SUPV', name: 'Grupo Supervielle S.A.', sector: 'Financiero', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'TEO', name: 'Telecom Argentina S.A.', sector: 'Telecomunicaciones', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'CEPU', name: 'Central Puerto S.A.', sector: 'Servicios Públicos', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'TX', name: 'Ternium Argentina S.A.', sector: 'Industrial', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'LOMA', name: 'Loma Negra C.I.A.S.A.', sector: 'Materiales', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'TGS', name: 'Transportadora de Gas del Sur S.A.', sector: 'Energía', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'EDN', name: 'Edenor S.A.', sector: 'Servicios Públicos', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'DESP', name: 'Despegar.com Corp.', sector: 'Tecnología', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'MELI', name: 'MercadoLibre Inc.', sector: 'Tecnología', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'IRS', name: 'IRSA Inversiones y Representaciones S.A.', sector: 'Bienes Raíces', region: 'AR', currency: 'USD', type: 'Equity' },
       
       // 🇧🇷 Brasil
       { symbol: 'VALE', name: 'Vale S.A.', sector: 'Minería', region: 'BR', currency: 'BRL', type: 'Equity' },
       { symbol: 'PETR4', name: 'Petróleo Brasileiro S.A.', sector: 'Energía', region: 'BR', currency: 'BRL', type: 'Equity' },
+      { symbol: 'PBR', name: 'Petrobras ADR', sector: 'Energía', region: 'BR', currency: 'USD', type: 'Equity' },
       
       // 🏦 Crypto
       { symbol: 'BTC', name: 'Bitcoin', sector: 'Criptomoneda', region: 'Global', currency: 'USD', type: 'Crypto' },
@@ -192,6 +210,15 @@ class SymbolSearchService {
   // Todos los símbolos mock para búsqueda
   getAllMockSymbols() {
     return [
+      // 📊 ETFs
+      { symbol: 'SPY', name: 'SPDR S&P 500 ETF Trust', sector: 'ETF', region: 'US', currency: 'USD', type: 'ETF' },
+      { symbol: 'QQQ', name: 'Invesco QQQ Trust (Nasdaq-100)', sector: 'ETF', region: 'US', currency: 'USD', type: 'ETF' },
+      { symbol: 'DIA', name: 'SPDR Dow Jones Industrial Average ETF', sector: 'ETF', region: 'US', currency: 'USD', type: 'ETF' },
+      { symbol: 'IWM', name: 'iShares Russell 2000 ETF', sector: 'ETF', region: 'US', currency: 'USD', type: 'ETF' },
+      { symbol: 'VTI', name: 'Vanguard Total Stock Market ETF', sector: 'ETF', region: 'US', currency: 'USD', type: 'ETF' },
+      { symbol: 'VOO', name: 'Vanguard S&P 500 ETF', sector: 'ETF', region: 'US', currency: 'USD', type: 'ETF' },
+      { symbol: 'TQQQ', name: 'ProShares UltraPro QQQ (3x)', sector: 'ETF', region: 'US', currency: 'USD', type: 'ETF' },
+      
       // 🇺🇸 Estados Unidos - Tecnología
       { symbol: 'AAPL', name: 'Apple Inc.', sector: 'Tecnología', region: 'US', currency: 'USD', type: 'Equity' },
       { symbol: 'GOOGL', name: 'Alphabet Inc. (Google)', sector: 'Tecnología', region: 'US', currency: 'USD', type: 'Equity' },
@@ -227,13 +254,20 @@ class SymbolSearchService {
       { symbol: 'XOM', name: 'Exxon Mobil Corporation', sector: 'Energía', region: 'US', currency: 'USD', type: 'Equity' },
       { symbol: 'CVX', name: 'Chevron Corporation', sector: 'Energía', region: 'US', currency: 'USD', type: 'Equity' },
       
-      // 🇦🇷 Argentina
-      { symbol: 'YPFD', name: 'YPF S.A.', sector: 'Energía', region: 'AR', currency: 'ARS', type: 'Equity' },
-      { symbol: 'PAMP', name: 'Pampa Energía S.A.', sector: 'Energía', region: 'AR', currency: 'ARS', type: 'Equity' },
-      { symbol: 'TECO2', name: 'Telecom Argentina S.A.', sector: 'Telecomunicaciones', region: 'AR', currency: 'ARS', type: 'Equity' },
-      { symbol: 'BMA', name: 'Banco Macro S.A.', sector: 'Financiero', region: 'AR', currency: 'ARS', type: 'Equity' },
-      { symbol: 'SUPV', name: 'Grupo Supervielle S.A.', sector: 'Financiero', region: 'AR', currency: 'ARS', type: 'Equity' },
-      { symbol: 'CEPU', name: 'Central Puerto S.A.', sector: 'Utilities', region: 'AR', currency: 'ARS', type: 'Equity' },
+      // 🇦🇷 Argentina (NYSE - ADRs en USD)
+      { symbol: 'YPFD', name: 'YPF S.A.', sector: 'Energía', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'PAMP', name: 'Pampa Energía S.A.', sector: 'Energía', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'TECO2', name: 'Telecom Argentina S.A.', sector: 'Telecomunicaciones', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'BMA', name: 'Banco Macro S.A.', sector: 'Financiero', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'SUPV', name: 'Grupo Supervielle S.A.', sector: 'Financiero', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'CEPU', name: 'Central Puerto S.A.', sector: 'Utilities', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'TX', name: 'Ternium Argentina S.A.', sector: 'Industrial', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'LOMA', name: 'Loma Negra C.I.A.S.A.', sector: 'Materiales', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'TGS', name: 'Transportadora de Gas del Sur S.A.', sector: 'Energía', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'EDN', name: 'Edenor S.A.', sector: 'Utilities', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'DESP', name: 'Despegar.com Corp.', sector: 'Tecnología', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'MELI', name: 'MercadoLibre Inc.', sector: 'Tecnología', region: 'AR', currency: 'USD', type: 'Equity' },
+      { symbol: 'IRS', name: 'IRSA Inversiones y Representaciones S.A.', sector: 'Bienes Raíces', region: 'AR', currency: 'USD', type: 'Equity' },
       
       // 🇧🇷 Brasil
       { symbol: 'VALE', name: 'Vale S.A.', sector: 'Minería', region: 'BR', currency: 'BRL', type: 'Equity' },
@@ -241,6 +275,7 @@ class SymbolSearchService {
       { symbol: 'ITUB', name: 'Itaú Unibanco Holding S.A.', sector: 'Financiero', region: 'BR', currency: 'BRL', type: 'Equity' },
       { symbol: 'BBDC4', name: 'Banco Bradesco S.A.', sector: 'Financiero', region: 'BR', currency: 'BRL', type: 'Equity' },
       { symbol: 'ABEV', name: 'Ambev S.A.', sector: 'Consumo', region: 'BR', currency: 'BRL', type: 'Equity' },
+      { symbol: 'PBR', name: 'Petrobras ADR', sector: 'Energía', region: 'BR', currency: 'USD', type: 'Equity' },
       
       // 🇨🇳 China
       { symbol: 'BABA', name: 'Alibaba Group Holding Ltd.', sector: 'E-commerce', region: 'CN', currency: 'USD', type: 'Equity' },

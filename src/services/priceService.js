@@ -165,16 +165,49 @@ class PriceService {
   generateMockPrice(symbol) {
     // Precios base simulados para diferentes símbolos
     const basePrices = {
+      // ETFs
+      'SPY': 450,
+      'QQQ': 380,
+      'DIA': 350,
+      'IWM': 200,
+      'VTI': 240,
+      'VOO': 420,
+      'TQQQ': 120,
+      // US Stocks
       'AAPL': 150,
       'GOOGL': 130,
       'MSFT': 300,
       'TSLA': 200,
       'AMZN': 120,
       'NVDA': 400,
-      'META': 250
+      'META': 250,
+      // ADRs Argentinos
+      'YPF': 18,
+      'PAM': 12,
+      'BMA': 20,
+      'GGAL': 13,
+      'SUPV': 5,
+      'TEO': 6,
+      'CEPU': 10,
+      'TX': 40,
+      'LOMA': 8,
+      'TGS': 9,
+      'EDN': 4,
+      'DESP': 10,
+      'MELI': 1200,
+      'IRS': 7,
+      // Brasil ADR
+      'PBR': 15,
+      // Genérico
+      'VALE': 14,
+      'PETR4': 7,
+      'ITUB': 6,
+      'BBDC4': 4,
+      'ABEV': 3
     };
     
-    const basePrice = basePrices[symbol.toUpperCase()] || 100;
+    const upperSymbol = symbol.toUpperCase();
+    const basePrice = basePrices[upperSymbol] || 100;
     // Agregar variación aleatoria de ±5%
     const variation = (Math.random() - 0.5) * 0.1; // -5% a +5%
     const mockPrice = basePrice * (1 + variation);
