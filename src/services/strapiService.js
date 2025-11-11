@@ -233,16 +233,35 @@ class StrapiService {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error(`❌ Update failed:`, response.status, errorData);
-        
-        if (response.status === 401) {
-          console.log('🔓 Token expired or invalid');
-          this.clearToken();
-          throw new Error('Tu sesión ha expirado. Por favor, recarga la página e inicia sesión nuevamente.');
+        let errorData = null;
+
+        try {
+          errorData = await response.json();
+        } catch (parseError) {
+          console.warn('⚠️ No se pudo parsear la respuesta de error:', parseError);
         }
-        
-        throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+
+        console.error(`❌ Update failed:`, response.status, errorData);
+
+        const errorMessage = errorData?.error?.message || errorData?.message || '';
+        const normalizedMessage = errorMessage.toLowerCase();
+        const permissionKeywords = ['permiso', 'permisos'];
+        const tokenKeywords = ['token', 'sesión', 'sesion', 'jwt', 'expir', 'autentic', 'credential'];
+        const isPermissionIssue = permissionKeywords.some(keyword => normalizedMessage.includes(keyword));
+        const isTokenIssue = tokenKeywords.some(keyword => normalizedMessage.includes(keyword))
+          || (!isPermissionIssue && normalizedMessage.includes('unauthorized'));
+
+        if (response.status === 401) {
+          if (isTokenIssue) {
+            console.log('🔓 Token expirado o inválido, limpiando sesión');
+            this.clearToken();
+            throw new Error('Tu sesión ha expirado. Por favor, recarga la página e inicia sesión nuevamente.');
+          }
+
+          throw new Error(errorMessage || 'No tienes permisos para modificar este trade.');
+        }
+
+        throw new Error(errorMessage || `HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
