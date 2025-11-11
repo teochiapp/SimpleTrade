@@ -39,12 +39,26 @@ module.exports = createCoreController('api::trade.trade', ({ strapi }) => ({
       populate: ['user']
     });
 
-    if (!existingTrade || existingTrade.user.id !== user.id) {
+    if (!existingTrade) {
+      return ctx.notFound('Trade no encontrado');
+    }
+
+    const existingUserId = existingTrade.user?.id != null ? Number(existingTrade.user.id) : null;
+    const currentUserId = user?.id != null ? Number(user.id) : null;
+
+    if (!currentUserId) {
+      return ctx.unauthorized('Usuario no autenticado');
+    }
+
+    if (existingUserId && existingUserId !== currentUserId) {
       return ctx.unauthorized('No tienes permisos para modificar este trade');
     }
 
     const entity = await strapi.entityService.update('api::trade.trade', id, {
-      data,
+      data: {
+        ...data,
+        user: existingUserId || currentUserId
+      },
       populate: ['user']
     });
 
