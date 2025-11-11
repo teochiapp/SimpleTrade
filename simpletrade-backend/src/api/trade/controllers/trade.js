@@ -43,7 +43,20 @@ module.exports = createCoreController('api::trade.trade', ({ strapi }) => ({
       return ctx.notFound('Trade no encontrado');
     }
 
-    const existingUserId = existingTrade.user?.id != null ? Number(existingTrade.user.id) : null;
+    console.log('🔍 UPDATE - existingTrade.user:', JSON.stringify(existingTrade.user));
+    console.log('🔍 UPDATE - typeof existingTrade.user:', typeof existingTrade.user);
+    console.log('🔍 UPDATE - ctx.state.user:', JSON.stringify(user));
+
+    // Manejar diferentes formatos de user ID
+    let existingUserId = null;
+    if (existingTrade.user) {
+      if (typeof existingTrade.user === 'number') {
+        existingUserId = existingTrade.user;
+      } else if (typeof existingTrade.user === 'object' && existingTrade.user.id) {
+        existingUserId = Number(existingTrade.user.id);
+      }
+    }
+    
     const currentUserId = user?.id != null ? Number(user.id) : null;
 
     if (!currentUserId) {
